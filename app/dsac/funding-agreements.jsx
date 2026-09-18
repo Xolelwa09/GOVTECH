@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import {
   Alert,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -20,40 +21,424 @@ export default function FundingAgreementsScreen() {
   const [agreementNumber, setAgreementNumber] = useState('');
   const [organisation, setOrganisation] = useState('');
   const [amount, setAmount] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
 
-  const saveAgreement = () => {
-    if (
-      !agreementNumber ||
-      !organisation ||
-      !amount ||
-      !startDate ||
-      !endDate
-    ) {
-      Alert.alert(
-        'Missing Information',
-        'Please complete all funding agreement fields.'
-      );
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [datePickerType, setDatePickerType] = useState(null);
+
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
+
+  const [errors, setErrors] = useState({
+    agreementNumber: '',
+    organisation: '',
+    amount: '',
+    startDate: '',
+    endDate: '',
+  });
+
+  /* =========================================================
+     DATE HELPERS
+  ========================================================= */
+
+  const normalizeDate = (date) => {
+    const result = new Date(date);
+    result.setHours(0, 0, 0, 0);
+    return result;
+  };
+
+  const getToday = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  };
+
+  const formatDate = (date) => {
+    if (!date) return '';
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatCalendarMonth = (date) => {
+    return date.toLocaleDateString('en-ZA', {
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
+  /* =========================================================
+     CALENDAR
+  ========================================================= */
+
+  const getCalendarDays = (monthDate) => {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    const firstWeekday = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+
+    const days = [];
+
+    // Empty cells before first day
+    for (let i = 0; i < firstWeekday; i++) {
+      days.push(null);
+    }
+
+    // Actual days
+    for (let day = 1; day <= totalDays; day++) {
+      days.push(new Date(year, month, day));
+    }
+
+    // Complete final week
+    while (days.length % 7 !== 0) {
+      days.push(null);
+    }
+
+    return days;
+  };
+
+  const isSameDate = (first, second) => {
+    if (!first || !second) return false;
+
+    return (
+      first.getFullYear() === second.getFullYear() &&
+      first.getMonth() === second.getMonth() &&
+      first.getDate() === second.getDate()
+    );
+  };
+
+  const isDateBefore = (first, second) => {
+    return normalizeDate(first) < normalizeDate(second);
+  };
+
+  const isDateDisabled = (date) => {
+    if (!date) return true;
+
+    const today = getToday();
+
+    if (datePickerType === 'start') {
+      return isDateBefore(date, today);
+    }
+
+    if (datePickerType === 'end') {
+      const minimumDate = startDate || today;
+      return isDateBefore(date, minimumDate);
+    }
+
+    return false;
+  };
+
+  const openDatePicker = (type) => {
+    const initialDate =
+      type === 'start'
+        ? startDate || getToday()
+        : endDate || startDate || getToday();
+
+    setDatePickerType(type);
+    setCalendarMonth(
+      new Date(
+        initialDate.getFullYear(),
+        initialDate.getMonth(),
+        1
+      )
+    );
+    setDatePickerVisible(true);
+  };
+
+  const closeDatePicker = () => {
+    setDatePickerVisible(false);
+    setDatePickerType(null);
+  };
+
+  const selectCalendarDate = (date) => {
+    if (!date || isDateDisabled(date)) {
       return;
     }
 
+    const selected = normalizeDate(date);
+
+    if (datePickerType === 'start') {
+      setStartDate(selected);
+
+      // If existing end date becomes invalid, clear it.
+      if (endDate && isDateBefore(endDate, selected)) {
+        setEndDate(null);
+
+        setErrors((previous) => ({
+          ...previous,
+          startDate: '',
+          endDate: 'Please select an end date after the start date.',
+        }));
+      } else {
+        setErrors((previous) => ({
+          ...previous,
+          startDate: '',
+        }));
+      }
+    }
+
+    if (datePickerType === 'end') {
+      setEndDate(selected);
+
+      setErrors((previous) => ({
+        ...previous,
+        endDate: '',
+      }));
+    }
+
+    closeDatePicker();
+  };
+
+  const changeCalendarMonth = (direction) => {
+    setCalendarMonth(
+      (previous) =>
+        new Date(
+          previous.getFullYear(),
+          previous.getMonth() + direction,
+          1
+        )
+    );
+  };
+
+  const renderCalendar = () => {
+    const days = getCalendarDays(calendarMonth);
+
+    return (
+      <View style={styles.calendar}>
+        <View style={styles.calendarHeader}>
+          <Pressable
+            style={styles.monthButton}
+            onPress={() => changeCalendarMonth(-1)}
+          >
+            <Text style={styles.monthButtonText}>‹</Text>
+          </Pressable>
+
+          <Text style={styles.calendarMonth}>
+            {formatCalendarMonth(calendarMonth)}
+          </Text>
+
+          <Pressable
+            style={styles.monthButton}
+            onPress={() => changeCalendarMonth(1)}
+          >
+            <Text style={styles.monthButtonText}>›</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.weekHeader}>
+          {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(
+            (day) => (
+              <View style={styles.weekDay} key={day}>
+                <Text style={styles.weekDayText}>{day}</Text>
+              </View>
+            )
+          )}
+        </View>
+
+        <View style={styles.calendarGrid}>
+          {days.map((date, index) => {
+            if (!date) {
+              return (
+                <View
+                  key={`empty-${index}`}
+                  style={styles.calendarDay}
+                />
+              );
+            }
+
+            const disabled = isDateDisabled(date);
+
+            const selected =
+              datePickerType === 'start'
+                ? isSameDate(date, startDate)
+                : isSameDate(date, endDate);
+
+            const today = isSameDate(date, getToday());
+
+            return (
+              <Pressable
+                key={formatDate(date)}
+                disabled={disabled}
+                onPress={() => selectCalendarDate(date)}
+                style={[
+                  styles.calendarDay,
+                  selected && styles.calendarDaySelected,
+                  today &&
+                    !selected &&
+                    styles.calendarDayToday,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.calendarDayText,
+                    disabled &&
+                      styles.calendarDayTextDisabled,
+                    selected &&
+                      styles.calendarDayTextSelected,
+                    today &&
+                      !selected &&
+                      styles.calendarDayTextToday,
+                  ]}
+                >
+                  {date.getDate()}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  /* =========================================================
+     VALIDATION
+  ========================================================= */
+
+  const validateForm = () => {
+    const newErrors = {
+      agreementNumber: '',
+      organisation: '',
+      amount: '',
+      startDate: '',
+      endDate: '',
+    };
+
+    const cleanAgreementNumber =
+      agreementNumber.trim().toUpperCase();
+
+    const cleanOrganisation = organisation.trim();
+
+    const cleanAmount = amount.replace(/[\s,]/g, '');
+
+    if (!cleanAgreementNumber) {
+      newErrors.agreementNumber =
+        'Agreement number is required.';
+    } else if (
+      !/^DSAC-FA-\d{4}-\d{3,}$/.test(
+        cleanAgreementNumber
+      )
+    ) {
+      newErrors.agreementNumber =
+        'Use the format DSAC-FA-2026-001.';
+    }
+
+    if (!cleanOrganisation) {
+      newErrors.organisation =
+        'Organisation is required.';
+    } else if (cleanOrganisation.length < 2) {
+      newErrors.organisation =
+        'Please enter a valid organisation name.';
+    }
+
+    if (!cleanAmount) {
+      newErrors.amount =
+        'Funding amount is required.';
+    } else if (!/^\d+(\.\d{1,2})?$/.test(cleanAmount)) {
+      newErrors.amount =
+        'Enter a valid amount, for example 500000 or 500000.00.';
+    } else if (Number(cleanAmount) <= 0) {
+      newErrors.amount =
+        'Funding amount must be greater than R0.';
+    }
+
+    if (!startDate) {
+      newErrors.startDate =
+        'Start date is required.';
+    } else if (isDateBefore(startDate, getToday())) {
+      newErrors.startDate =
+        'Start date cannot be in the past.';
+    }
+
+    if (!endDate) {
+      newErrors.endDate =
+        'End date is required.';
+    } else if (
+      startDate &&
+      isDateBefore(endDate, startDate)
+    ) {
+      newErrors.endDate =
+        'End date cannot be before the start date.';
+    }
+
+    setErrors(newErrors);
+
+    return !Object.values(newErrors).some(
+      (error) => error !== ''
+    );
+  };
+
+  /* =========================================================
+     SAVE AGREEMENT
+  ========================================================= */
+
+  const saveAgreement = () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    const cleanAgreementNumber =
+      agreementNumber.trim().toUpperCase();
+
+    const cleanOrganisation =
+      organisation.trim();
+
+    const cleanAmount =
+      amount.replace(/[\s,]/g, '');
+
+    const agreement = {
+      agreementNumber: cleanAgreementNumber,
+      organisation: cleanOrganisation,
+      amount: Number(cleanAmount),
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate),
+    };
+
+    console.log(
+      'CIVITRACK Funding Agreement:',
+      agreement
+    );
+
     Alert.alert(
       'Funding Agreement',
-      'The funding agreement has been captured for the MVP. Supabase persistence will be connected next.'
+      'The funding agreement has been successfully validated and captured for the MVP. Supabase persistence will be connected next.'
     );
 
     setAgreementNumber('');
     setOrganisation('');
     setAmount('');
-    setStartDate('');
-    setEndDate('');
+    setStartDate(null);
+    setEndDate(null);
+
+    setErrors({
+      agreementNumber: '',
+      organisation: '',
+      amount: '',
+      startDate: '',
+      endDate: '',
+    });
+
     setShowForm(false);
+  };
+
+  /* =========================================================
+     FORM
+  ========================================================= */
+
+  const closeForm = () => {
+    setShowForm(false);
+    closeDatePicker();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-
       <StatusBar
         barStyle="light-content"
         backgroundColor="#18202A"
@@ -63,44 +448,27 @@ export default function FundingAgreementsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-
-        {/* ================================================= */}
         {/* SOUTH AFRICAN COLOUR STRIP */}
-        {/* ================================================= */}
-
         <View style={styles.flagStrip}>
-
           <View style={styles.flagBlack} />
           <View style={styles.flagGold} />
           <View style={styles.flagGreen} />
           <View style={styles.flagBlue} />
           <View style={styles.flagRed} />
-
         </View>
 
-
-        {/* ================================================= */}
-        {/* GOVERNMENT MASTHEAD */}
-        {/* ================================================= */}
-
+        {/* GOVERNMENT HEADER */}
         <View style={styles.govHeader}>
-
           <View style={styles.govIdentity}>
-
-            {/* Temporary RSA emblem */}
             <View style={styles.emblemContainer}>
-
               <View style={styles.emblem}>
                 <Text style={styles.emblemText}>
                   RSA
                 </Text>
               </View>
-
             </View>
 
-
             <View style={styles.govText}>
-
               <Text style={styles.republic}>
                 REPUBLIC OF SOUTH AFRICA
               </Text>
@@ -114,22 +482,13 @@ export default function FundingAgreementsScreen() {
               <Text style={styles.nationalDepartment}>
                 National Department
               </Text>
-
             </View>
-
           </View>
-
         </View>
 
-
-        {/* ================================================= */}
-        {/* CIVITRACK SYSTEM BAR */}
-        {/* ================================================= */}
-
+        {/* SYSTEM BAR */}
         <View style={styles.systemBar}>
-
           <View style={styles.systemIdentity}>
-
             <Text style={styles.systemName}>
               CIVITRACK
             </Text>
@@ -137,14 +496,9 @@ export default function FundingAgreementsScreen() {
             <Text style={styles.systemDescription}>
               Public Funding & Accountability Management System
             </Text>
-
           </View>
 
-
-          {/* TOP RIGHT ACTIONS */}
-
           <View style={styles.systemActions}>
-
             <Pressable
               onPress={() =>
                 router.replace('/dsac/dashboard')
@@ -154,49 +508,33 @@ export default function FundingAgreementsScreen() {
                 pressed && styles.buttonPressed,
               ]}
             >
-
               <Text style={styles.dashboardButtonText}>
                 ← Dashboard
               </Text>
-
             </Pressable>
 
-
             <View style={styles.systemStatus}>
-
               <View style={styles.statusDot} />
 
               <Text style={styles.statusText}>
                 SECURE SYSTEM
               </Text>
-
             </View>
-
           </View>
-
         </View>
 
-
-        {/* ================================================= */}
-        {/* PAGE CONTENT */}
-        {/* ================================================= */}
-
+        {/* MAIN */}
         <View style={styles.main}>
-
-          {/* Breadcrumb */}
-
+          {/* BREADCRUMB */}
           <View style={styles.breadcrumb}>
-
             <Pressable
               onPress={() =>
                 router.replace('/dsac/dashboard')
               }
             >
-
               <Text style={styles.breadcrumbLink}>
                 CIVITRACK
               </Text>
-
             </Pressable>
 
             <Text style={styles.breadcrumbDivider}>
@@ -214,18 +552,11 @@ export default function FundingAgreementsScreen() {
             <Text style={styles.breadcrumbCurrent}>
               Funding Agreements
             </Text>
-
           </View>
 
-
-          {/* ================================================= */}
-          {/* PAGE HEADING */}
-          {/* ================================================= */}
-
+          {/* HEADING */}
           <View style={styles.heading}>
-
             <View style={styles.headingContent}>
-
               <View style={styles.sectionMarker} />
 
               <Text style={styles.eyebrow}>
@@ -241,18 +572,17 @@ export default function FundingAgreementsScreen() {
                 allocations and associated accountability
                 requirements.
               </Text>
-
             </View>
-
 
             <Pressable
               style={({ pressed }) => [
                 styles.createButton,
                 pressed && styles.buttonPressed,
               ]}
-              onPress={() => setShowForm(!showForm)}
+              onPress={() =>
+                setShowForm(!showForm)
+              }
             >
-
               <Text style={styles.createButtonPlus}>
                 +
               </Text>
@@ -262,27 +592,16 @@ export default function FundingAgreementsScreen() {
                   ? 'CLOSE FORM'
                   : 'CREATE AGREEMENT'}
               </Text>
-
             </Pressable>
-
           </View>
 
-
-          {/* ================================================= */}
           {/* FORM */}
-          {/* ================================================= */}
-
           {showForm && (
-
             <View style={styles.form}>
-
               <View style={styles.formTop} />
 
-
               <View style={styles.formHeader}>
-
                 <View>
-
                   <Text style={styles.formEyebrow}>
                     NEW RECORD
                   </Text>
@@ -295,30 +614,21 @@ export default function FundingAgreementsScreen() {
                     Capture the core details of a departmental
                     funding agreement.
                   </Text>
-
                 </View>
 
-
                 <View style={styles.formStatus}>
-
                   <View style={styles.formStatusDot} />
 
                   <Text style={styles.formStatusText}>
                     DRAFT
                   </Text>
-
                 </View>
-
               </View>
-
 
               <View style={styles.formDivider} />
 
-
               {/* AGREEMENT NUMBER */}
-
               <View style={styles.field}>
-
                 <Text style={styles.label}>
                   AGREEMENT NUMBER
                   <Text style={styles.required}>
@@ -327,21 +637,43 @@ export default function FundingAgreementsScreen() {
                 </Text>
 
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    errors.agreementNumber &&
+                      styles.inputError,
+                  ]}
                   placeholder="e.g. DSAC-FA-2026-001"
                   placeholderTextColor="#8A9298"
                   value={agreementNumber}
-                  onChangeText={setAgreementNumber}
+                  onChangeText={(text) => {
+                    setAgreementNumber(
+                      text.toUpperCase()
+                    );
+
+                    if (errors.agreementNumber) {
+                      setErrors((previous) => ({
+                        ...previous,
+                        agreementNumber: '',
+                      }));
+                    }
+                  }}
                   autoCapitalize="characters"
+                  autoCorrect={false}
                 />
 
+                {errors.agreementNumber ? (
+                  <Text style={styles.errorText}>
+                    {errors.agreementNumber}
+                  </Text>
+                ) : (
+                  <Text style={styles.helperText}>
+                    Format: DSAC-FA-YYYY-001
+                  </Text>
+                )}
               </View>
 
-
               {/* ORGANISATION */}
-
               <View style={styles.field}>
-
                 <Text style={styles.label}>
                   ORGANISATION
                   <Text style={styles.required}>
@@ -350,20 +682,36 @@ export default function FundingAgreementsScreen() {
                 </Text>
 
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    errors.organisation &&
+                      styles.inputError,
+                  ]}
                   placeholder="Enter or select organisation"
                   placeholderTextColor="#8A9298"
                   value={organisation}
-                  onChangeText={setOrganisation}
+                  onChangeText={(text) => {
+                    setOrganisation(text);
+
+                    if (errors.organisation) {
+                      setErrors((previous) => ({
+                        ...previous,
+                        organisation: '',
+                      }));
+                    }
+                  }}
+                  autoCorrect={false}
                 />
 
+                {errors.organisation ? (
+                  <Text style={styles.errorText}>
+                    {errors.organisation}
+                  </Text>
+                ) : null}
               </View>
 
-
               {/* AMOUNT */}
-
               <View style={styles.field}>
-
                 <Text style={styles.label}>
                   FUNDING AMOUNT
                   <Text style={styles.required}>
@@ -371,32 +719,58 @@ export default function FundingAgreementsScreen() {
                   </Text>
                 </Text>
 
-                <View style={styles.amountInputContainer}>
-
+                <View
+                  style={[
+                    styles.amountInputContainer,
+                    errors.amount &&
+                      styles.inputError,
+                  ]}
+                >
                   <Text style={styles.currencyPrefix}>
                     R
                   </Text>
 
                   <TextInput
                     style={styles.amountInput}
-                    placeholder="500 000"
+                    placeholder="500000.00"
                     placeholderTextColor="#8A9298"
                     value={amount}
-                    onChangeText={setAmount}
-                    keyboardType="numeric"
-                  />
+                    onChangeText={(text) => {
+                      const cleaned =
+                        text.replace(
+                          /[^0-9. ]/g,
+                          ''
+                        );
 
+                      setAmount(cleaned);
+
+                      if (errors.amount) {
+                        setErrors((previous) => ({
+                          ...previous,
+                          amount: '',
+                        }));
+                      }
+                    }}
+                    keyboardType="decimal-pad"
+                    autoCorrect={false}
+                  />
                 </View>
 
+                {errors.amount ? (
+                  <Text style={styles.errorText}>
+                    {errors.amount}
+                  </Text>
+                ) : (
+                  <Text style={styles.helperText}>
+                    Enter the funding amount in South African Rand.
+                  </Text>
+                )}
               </View>
 
-
-              {/* DATES */}
-
+              {/* DATE SECTION */}
               <View style={styles.dateRow}>
-
+                {/* START DATE */}
                 <View style={styles.dateField}>
-
                   <Text style={styles.label}>
                     START DATE
                     <Text style={styles.required}>
@@ -404,19 +778,46 @@ export default function FundingAgreementsScreen() {
                     </Text>
                   </Text>
 
-                  <TextInput
-                    style={styles.input}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor="#8A9298"
-                    value={startDate}
-                    onChangeText={setStartDate}
-                  />
+                  <Pressable
+                    style={[
+                      styles.dateInput,
+                      errors.startDate &&
+                        styles.inputError,
+                    ]}
+                    onPress={() =>
+                      openDatePicker('start')
+                    }
+                  >
+                    <Text
+                      style={
+                        startDate
+                          ? styles.dateValue
+                          : styles.datePlaceholder
+                      }
+                    >
+                      {startDate
+                        ? formatDate(startDate)
+                        : 'Select start date'}
+                    </Text>
 
+                    <Text style={styles.calendarIcon}>
+                      📅
+                    </Text>
+                  </Pressable>
+
+                  {errors.startDate ? (
+                    <Text style={styles.errorText}>
+                      {errors.startDate}
+                    </Text>
+                  ) : (
+                    <Text style={styles.helperText}>
+                      Select from the calendar.
+                    </Text>
+                  )}
                 </View>
 
-
+                {/* END DATE */}
                 <View style={styles.dateField}>
-
                   <Text style={styles.label}>
                     END DATE
                     <Text style={styles.required}>
@@ -424,71 +825,80 @@ export default function FundingAgreementsScreen() {
                     </Text>
                   </Text>
 
-                  <TextInput
-                    style={styles.input}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor="#8A9298"
-                    value={endDate}
-                    onChangeText={setEndDate}
-                  />
+                  <Pressable
+                    style={[
+                      styles.dateInput,
+                      errors.endDate &&
+                        styles.inputError,
+                    ]}
+                    onPress={() =>
+                      openDatePicker('end')
+                    }
+                  >
+                    <Text
+                      style={
+                        endDate
+                          ? styles.dateValue
+                          : styles.datePlaceholder
+                      }
+                    >
+                      {endDate
+                        ? formatDate(endDate)
+                        : 'Select end date'}
+                    </Text>
 
+                    <Text style={styles.calendarIcon}>
+                      📅
+                    </Text>
+                  </Pressable>
+
+                  {errors.endDate ? (
+                    <Text style={styles.errorText}>
+                      {errors.endDate}
+                    </Text>
+                  ) : (
+                    <Text style={styles.helperText}>
+                      Must be after start date.
+                    </Text>
+                  )}
                 </View>
-
               </View>
 
-
               {/* FORM ACTIONS */}
-
               <View style={styles.actions}>
-
                 <Pressable
                   style={({ pressed }) => [
                     styles.cancel,
-                    pressed && styles.buttonPressed,
+                    pressed &&
+                      styles.buttonPressed,
                   ]}
-                  onPress={() => setShowForm(false)}
+                  onPress={closeForm}
                 >
-
                   <Text style={styles.cancelText}>
                     CANCEL
                   </Text>
-
                 </Pressable>
-
 
                 <Pressable
                   style={({ pressed }) => [
                     styles.save,
-                    pressed && styles.buttonPressed,
+                    pressed &&
+                      styles.buttonPressed,
                   ]}
                   onPress={saveAgreement}
                 >
-
                   <Text style={styles.saveText}>
                     SAVE AGREEMENT
                   </Text>
-
                 </Pressable>
-
               </View>
-
             </View>
-
           )}
 
-
-          {/* ================================================= */}
           {/* SUMMARY */}
-          {/* ================================================= */}
-
           <View style={styles.summaryGrid}>
-
-            {/* Active Agreements */}
-
             <View style={styles.summaryCard}>
-
               <View style={styles.summaryCardHeader}>
-
                 <View style={styles.summaryIconGreen}>
                   <Text style={styles.summaryIconText}>
                     FA
@@ -498,7 +908,6 @@ export default function FundingAgreementsScreen() {
                 <Text style={styles.summaryLabel}>
                   ACTIVE AGREEMENTS
                 </Text>
-
               </View>
 
               <Text style={styles.summaryNumber}>
@@ -510,16 +919,10 @@ export default function FundingAgreementsScreen() {
               </Text>
 
               <View style={styles.summaryBottomLineGreen} />
-
             </View>
 
-
-            {/* Total Allocation */}
-
             <View style={styles.summaryCard}>
-
               <View style={styles.summaryCardHeader}>
-
                 <View style={styles.summaryIconGold}>
                   <Text style={styles.summaryIconTextDark}>
                     R
@@ -529,7 +932,6 @@ export default function FundingAgreementsScreen() {
                 <Text style={styles.summaryLabel}>
                   TOTAL ALLOCATION
                 </Text>
-
               </View>
 
               <Text style={styles.summaryNumber}>
@@ -541,16 +943,10 @@ export default function FundingAgreementsScreen() {
               </Text>
 
               <View style={styles.summaryBottomLineGold} />
-
             </View>
 
-
-            {/* Pending */}
-
             <View style={styles.summaryCard}>
-
               <View style={styles.summaryCardHeader}>
-
                 <View style={styles.summaryIconBlue}>
                   <Text style={styles.summaryIconText}>
                     P
@@ -560,7 +956,6 @@ export default function FundingAgreementsScreen() {
                 <Text style={styles.summaryLabel}>
                   PENDING
                 </Text>
-
               </View>
 
               <Text style={styles.summaryNumber}>
@@ -572,20 +967,12 @@ export default function FundingAgreementsScreen() {
               </Text>
 
               <View style={styles.summaryBottomLineBlue} />
-
             </View>
-
           </View>
 
-
-          {/* ================================================= */}
-          {/* AGREEMENT LIST */}
-          {/* ================================================= */}
-
+          {/* LIST HEADER */}
           <View style={styles.listHeader}>
-
             <View>
-
               <Text style={styles.listEyebrow}>
                 RECORDS
               </Text>
@@ -593,33 +980,21 @@ export default function FundingAgreementsScreen() {
               <Text style={styles.sectionTitle}>
                 Funding Agreements
               </Text>
-
             </View>
 
-
             <View style={styles.recordCount}>
-
               <Text style={styles.recordCountText}>
                 0 RECORDS
               </Text>
-
             </View>
-
           </View>
 
-
-          {/* ================================================= */}
           {/* EMPTY STATE */}
-          {/* ================================================= */}
-
           <View style={styles.empty}>
-
             <View style={styles.emptyIcon}>
-
               <Text style={styles.emptyIconText}>
                 FA
               </Text>
-
             </View>
 
             <Text style={styles.emptyTitle}>
@@ -636,41 +1011,29 @@ export default function FundingAgreementsScreen() {
               creating a funding agreement.
             </Text>
 
-
             <Pressable
               style={({ pressed }) => [
                 styles.emptyButton,
-                pressed && styles.buttonPressed,
+                pressed &&
+                  styles.buttonPressed,
               ]}
               onPress={() => setShowForm(true)}
             >
-
               <Text style={styles.emptyButtonText}>
                 + CREATE FIRST AGREEMENT
               </Text>
-
             </Pressable>
-
           </View>
 
-
-          {/* ================================================= */}
           {/* INFORMATION NOTICE */}
-          {/* ================================================= */}
-
           <View style={styles.notice}>
-
             <View style={styles.noticeIcon}>
-
               <Text style={styles.noticeIconText}>
                 i
               </Text>
-
             </View>
 
-
             <View style={styles.noticeContent}>
-
               <Text style={styles.noticeTitle}>
                 FUNDING ADMINISTRATION
               </Text>
@@ -681,20 +1044,12 @@ export default function FundingAgreementsScreen() {
                 organisations, accountability cases and
                 approval workflows.
               </Text>
-
             </View>
-
           </View>
-
         </View>
 
-
-        {/* ================================================= */}
         {/* FOOTER */}
-        {/* ================================================= */}
-
         <View style={styles.footer}>
-
           <Text style={styles.footerRepublic}>
             REPUBLIC OF SOUTH AFRICA
           </Text>
@@ -713,22 +1068,80 @@ export default function FundingAgreementsScreen() {
           <Text style={styles.footerCopyright}>
             © 2026 Department of Sport, Arts and Culture
           </Text>
-
         </View>
-
       </ScrollView>
 
+      {/* =====================================================
+          CROSS-PLATFORM CALENDAR MODAL
+      ===================================================== */}
+
+      <Modal
+        visible={datePickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeDatePicker}
+      >
+        <View style={styles.calendarOverlay}>
+          <View style={styles.calendarModal}>
+            <View style={styles.calendarModalTop}>
+              <View>
+                <Text style={styles.calendarModalEyebrow}>
+                  DATE SELECTION
+                </Text>
+
+                <Text style={styles.calendarModalTitle}>
+                  {datePickerType === 'start'
+                    ? 'Select Start Date'
+                    : 'Select End Date'}
+                </Text>
+              </View>
+
+              <Pressable
+                onPress={closeDatePicker}
+                style={styles.closeCalendarButton}
+              >
+                <Text style={styles.closeCalendarText}>
+                  ×
+                </Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.calendarDivider} />
+
+            {renderCalendar()}
+
+            <View style={styles.calendarFooter}>
+              <Text style={styles.calendarHint}>
+                {datePickerType === 'start'
+                  ? 'Start date cannot be in the past.'
+                  : startDate
+                  ? `End date must be on or after ${formatDate(
+                      startDate
+                    )}.`
+                  : 'Select a start date first.'}
+              </Text>
+
+              <Pressable
+                onPress={closeDatePicker}
+                style={styles.calendarCancel}
+              >
+                <Text style={styles.calendarCancelText}>
+                  CANCEL
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
-
-/* ========================================================= */
-/* STYLES */
-/* ========================================================= */
+/* ============================================================
+   STYLES
+============================================================ */
 
 const styles = StyleSheet.create({
-
   safeArea: {
     flex: 1,
     backgroundColor: '#F2F4F5',
@@ -737,11 +1150,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-
-
-  /* ================================================= */
-  /* FLAG STRIP */
-  /* ================================================= */
 
   flagStrip: {
     height: 6,
@@ -772,11 +1180,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#DE3831',
   },
-
-
-  /* ================================================= */
-  /* GOVERNMENT HEADER */
-  /* ================================================= */
 
   govHeader: {
     backgroundColor: '#18202A',
@@ -849,11 +1252,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.6,
   },
-
-
-  /* ================================================= */
-  /* SYSTEM BAR */
-  /* ================================================= */
 
   systemBar: {
     backgroundColor: '#FFFFFF',
@@ -928,11 +1326,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.7,
   },
 
-
-  /* ================================================= */
-  /* MAIN */
-  /* ================================================= */
-
   main: {
     width: '100%',
     maxWidth: 1200,
@@ -940,11 +1333,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 30,
   },
-
-
-  /* ================================================= */
-  /* BREADCRUMB */
-  /* ================================================= */
 
   breadcrumb: {
     flexDirection: 'row',
@@ -970,11 +1358,6 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: '700',
   },
-
-
-  /* ================================================= */
-  /* HEADING */
-  /* ================================================= */
 
   heading: {
     flexDirection: 'row',
@@ -1044,11 +1427,6 @@ const styles = StyleSheet.create({
   buttonPressed: {
     opacity: 0.75,
   },
-
-
-  /* ================================================= */
-  /* FORM */
-  /* ================================================= */
 
   form: {
     backgroundColor: '#FFFFFF',
@@ -1154,6 +1532,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
+  inputError: {
+    borderColor: '#C0392B',
+    backgroundColor: '#FFF8F7',
+  },
+
+  errorText: {
+    color: '#C0392B',
+    fontSize: 9,
+    fontWeight: '600',
+    marginTop: 5,
+    lineHeight: 13,
+  },
+
+  helperText: {
+    color: '#8A9298',
+    fontSize: 8,
+    marginTop: 5,
+  },
+
   amountInputContainer: {
     height: 49,
     borderWidth: 1,
@@ -1186,6 +1583,229 @@ const styles = StyleSheet.create({
 
   dateField: {
     flex: 1,
+  },
+
+  dateInput: {
+    height: 49,
+    borderWidth: 1,
+    borderColor: '#C8CED2',
+    backgroundColor: '#FAFBFB',
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  dateValue: {
+    color: '#1E272F',
+    fontSize: 13,
+  },
+
+  datePlaceholder: {
+    color: '#8A9298',
+    fontSize: 13,
+  },
+
+  calendarIcon: {
+    fontSize: 15,
+  },
+
+  /* =========================================================
+     CALENDAR MODAL
+  ========================================================= */
+
+  calendarOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.48)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+
+  calendarModal: {
+    width: '100%',
+    maxWidth: 470,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D6DBDE',
+    padding: 24,
+    shadowColor: '#000000',
+    shadowOpacity: 0.18,
+    shadowRadius: 20,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 8,
+  },
+
+  calendarModalTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+
+  calendarModalEyebrow: {
+    color: '#007A4D',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginBottom: 5,
+  },
+
+  calendarModalTitle: {
+    color: '#18202A',
+    fontSize: 20,
+    fontWeight: '900',
+  },
+
+  closeCalendarButton: {
+    width: 34,
+    height: 34,
+    borderWidth: 1,
+    borderColor: '#D6DBDE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  closeCalendarText: {
+    color: '#4D565D',
+    fontSize: 25,
+    lineHeight: 27,
+    fontWeight: '300',
+  },
+
+  calendarDivider: {
+    height: 1,
+    backgroundColor: '#E2E5E7',
+    marginVertical: 18,
+  },
+
+  calendar: {
+    width: '100%',
+  },
+
+  calendarHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+
+  monthButton: {
+    width: 38,
+    height: 38,
+    borderWidth: 1,
+    borderColor: '#D5DADD',
+    backgroundColor: '#F7F8F8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  monthButtonText: {
+    color: '#18202A',
+    fontSize: 26,
+    lineHeight: 28,
+  },
+
+  calendarMonth: {
+    color: '#18202A',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+
+  weekHeader: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+
+  weekDay: {
+    flex: 1,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  weekDayText: {
+    color: '#78838B',
+    fontSize: 8,
+    fontWeight: '900',
+  },
+
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+
+  calendarDay: {
+    width: '14.2857%',
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  calendarDaySelected: {
+    backgroundColor: '#007A4D',
+    borderRadius: 4,
+  },
+
+  calendarDayToday: {
+    borderWidth: 1,
+    borderColor: '#D4A72C',
+    borderRadius: 4,
+  },
+
+  calendarDayText: {
+    color: '#27313A',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  calendarDayTextDisabled: {
+    color: '#C4C9CC',
+  },
+
+  calendarDayTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '900',
+  },
+
+  calendarDayTextToday: {
+    color: '#8A6800',
+    fontWeight: '900',
+  },
+
+  calendarFooter: {
+    marginTop: 18,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E5E7',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  calendarHint: {
+    flex: 1,
+    color: '#78838B',
+    fontSize: 9,
+    lineHeight: 14,
+    paddingRight: 12,
+  },
+
+  calendarCancel: {
+    borderWidth: 1,
+    borderColor: '#C8CED2',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+
+  calendarCancelText: {
+    color: '#4D565D',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 0.5,
   },
 
   actions: {
@@ -1228,11 +1848,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.5,
   },
-
-
-  /* ================================================= */
-  /* SUMMARY */
-  /* ================================================= */
 
   summaryGrid: {
     flexDirection: 'row',
@@ -1348,11 +1963,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#315A91',
   },
 
-
-  /* ================================================= */
-  /* LIST HEADER */
-  /* ================================================= */
-
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1389,11 +1999,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.6,
   },
-
-
-  /* ================================================= */
-  /* EMPTY STATE */
-  /* ================================================= */
 
   empty: {
     backgroundColor: '#FFFFFF',
@@ -1456,11 +2061,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 
-
-  /* ================================================= */
-  /* INFORMATION NOTICE */
-  /* ================================================= */
-
   notice: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -1506,11 +2106,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-
-  /* ================================================= */
-  /* FOOTER */
-  /* ================================================= */
-
   footer: {
     backgroundColor: '#18202A',
     borderTopWidth: 4,
@@ -1553,5 +2148,4 @@ const styles = StyleSheet.create({
     color: '#7F8992',
     fontSize: 8,
   },
-
 });

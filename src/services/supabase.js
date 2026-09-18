@@ -1,12 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://leitzamleuxgnqbwixis.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlaXR6YW1sZXV4Z25xYndpeGlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NjAzNjIsImV4cCI6MjEwNTIzNjM2Mn0.icZQWcNlU0XrmO2UoyRV0VZafEcO5wC9y4F0jzv_WO0';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Check your .env file.'
-  );
+if (!supabaseUrl) {
+  throw new Error('Missing EXPO_PUBLIC_SUPABASE_URL');
+}
+
+if (!supabaseAnonKey) {
+  throw new Error('Missing EXPO_PUBLIC_SUPABASE_ANON_KEY');
 }
 
 export const supabase = createClient(
@@ -20,3 +22,5 @@ export const supabase = createClient(
     },
   }
 );
+
+console.log('SUPABASE URL:', supabaseUrl);

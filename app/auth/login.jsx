@@ -31,6 +31,10 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({
+  email: '',
+  password: '',
+});
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) {
@@ -64,27 +68,53 @@ export default function LoginScreen() {
         break;
     }
   }
+const validateForm = () => {
+  const newErrors = {
+    email: '',
+    password: '',
+  };
 
-  const handleLogin = async () => {
-    const cleanEmail = email.trim().toLowerCase();
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanPassword = password.trim();
 
-    if (!cleanEmail || !password) {
-      Alert.alert(
-        'Login Required',
-        'Please enter your email address and password.'
-      );
-      return;
-    }
+  // Email validation
+  if (!cleanEmail) {
+    newErrors.email = 'Email address is required.';
+  } else if (
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
+  ) {
+    newErrors.email = 'Please enter a valid email address.';
+  }
 
-    setLoading(true);
+  // Password validation
+  if (!cleanPassword) {
+    newErrors.password = 'Password is required.';
+  } else if (cleanPassword.length < 6) {
+    newErrors.password =
+      'Password must be at least 6 characters.';
+  }
+
+  setErrors(newErrors);
+
+  return !newErrors.email && !newErrors.password;
+};
+ const handleLogin = async () => {
+  if (!validateForm()) {
+    return;
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanPassword = password.trim();
+
+  setLoading(true);
 
     try {
       console.log('CIVITRACK: Starting login...');
 
-      const result = await signIn(
-        cleanEmail,
-        password
-      );
+     const result = await signIn(
+  cleanEmail,
+  cleanPassword
+);
 
       if (!result.success) {
         Alert.alert(
@@ -371,17 +401,35 @@ export default function LoginScreen() {
                   EMAIL ADDRESS
                 </Text>
 
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your email address"
-                  placeholderTextColor="#8A9298"
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  editable={!loading}
-                />
+               <TextInput
+  style={[
+    styles.input,
+    errors.email && styles.inputError,
+  ]}
+  placeholder="Enter your email address"
+  placeholderTextColor="#8A9298"
+  value={email}
+  onChangeText={(text) => {
+    setEmail(text);
+
+    if (errors.email) {
+      setErrors((prev) => ({
+        ...prev,
+        email: '',
+      }));
+    }
+  }}
+  autoCapitalize="none"
+  autoCorrect={false}
+  keyboardType="email-address"
+  editable={!loading}
+/>
+
+{errors.email ? (
+  <Text style={styles.errorText}>
+    {errors.email}
+  </Text>
+) : null}
 
               </View>
 
@@ -394,16 +442,35 @@ export default function LoginScreen() {
                   PASSWORD
                 </Text>
 
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your password"
-                  placeholderTextColor="#8A9298"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  autoCapitalize="none"
-                  editable={!loading}
-                />
+               <TextInput
+  style={[
+    styles.input,
+    errors.password && styles.inputError,
+  ]}
+  placeholder="Enter your password"
+  placeholderTextColor="#8A9298"
+  value={password}
+  onChangeText={(text) => {
+    setPassword(text);
+
+    if (errors.password) {
+      setErrors((prev) => ({
+        ...prev,
+        password: '',
+      }));
+    }
+  }}
+  secureTextEntry
+  autoCapitalize="none"
+  autoCorrect={false}
+  editable={!loading}
+/>
+
+{errors.password ? (
+  <Text style={styles.errorText}>
+    {errors.password}
+  </Text>
+) : null}
 
               </View>
 
@@ -1112,4 +1179,15 @@ const styles = StyleSheet.create({
     fontSize: 8,
   },
 
+  inputError: {
+  borderColor: '#C0392B',
+  backgroundColor: '#FFF8F7',
+},
+
+errorText: {
+  color: '#C0392B',
+  fontSize: 9,
+  fontWeight: '600',
+  marginTop: 5,
+},
 });
