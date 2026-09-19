@@ -1005,18 +1005,6 @@ export default function ReviewerDashboard() {
 
         <ScrollView
           style={styles.container}
-<<<<<<< HEAD
-          contentContainerStyle={
-            styles.contentContainer
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
-          showsVerticalScrollIndicator={false}
-=======
   contentContainerStyle={styles.contentContainer}
   showsVerticalScrollIndicator={true}
   persistentScrollbar={true}
@@ -1026,7 +1014,6 @@ export default function ReviewerDashboard() {
       onRefresh={onRefresh}
     />
   }
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
         >
           {/* HEADER */}
 

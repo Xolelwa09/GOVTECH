@@ -964,11 +964,7 @@ export default function OrganisationDashboardScreen() {
 
           {/* ==================================================
               MAIN CONTENT
-<<<<<<< HEAD
-          ================================================== */}
-=======
           ============================================== */}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
           <View
             style={[
@@ -990,13 +986,9 @@ export default function OrganisationDashboardScreen() {
               <Text style={styles.breadcrumbCurrent}>
                 ORGANISATION
               </Text>
-<<<<<<< HEAD
-
-=======
             </View>
 
             {/* BREADCRUMB */}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <Text style={styles.breadcrumbSlash}>
                 /
               </Text>
@@ -1924,11 +1916,7 @@ export default function OrganisationDashboardScreen() {
                 </Text>
               </View>
             </View>
-<<<<<<< HEAD
-          </View>
-=======
       
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
           {/* ==================================================
               FOOTER

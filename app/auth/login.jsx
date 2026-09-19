@@ -678,11 +678,8 @@ const styles = StyleSheet.create({
     height: 85,
     borderRadius: 43,
     backgroundColor: '#18202A',
-<<<<<<< HEAD
-=======
     borderWidth: 2,
     borderColor: '#D4A72C',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -774,11 +771,8 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 35,
     backgroundColor: '#FFFFFF',
-<<<<<<< HEAD
-=======
     borderWidth: 2,
     borderColor: '#D4A72C',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1057,11 +1051,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#D7DCDF',
-<<<<<<< HEAD
-=======
     borderLeftWidth: 4,
     borderLeftColor: '#D4A72C',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     padding: 16,
     flexDirection: 'row',
     marginTop: 17,
@@ -1148,11 +1139,8 @@ const styles = StyleSheet.create({
 
   footer: {
     backgroundColor: '#18202A',
-<<<<<<< HEAD
-=======
     borderTopWidth: 4,
     borderTopColor: '#007A4D',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     paddingVertical: 27,
     alignItems: 'center',
     paddingHorizontal: 20,

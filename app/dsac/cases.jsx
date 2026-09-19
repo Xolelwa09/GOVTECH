@@ -1,11 +1,7 @@
-<<<<<<< HEAD
-import React, { useCallback, useState } from 'react';
-=======
 import React, {
   useCallback,
   useState,
 } from 'react';
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
 import {
   Alert,
@@ -18,10 +14,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
-<<<<<<< HEAD
-=======
   useWindowDimensions,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   View,
 } from 'react-native';
 
@@ -36,10 +29,6 @@ import { supabase } from '../../src/services/supabase';
 import { ROLES } from '../../src/constants/roles';
 
 export default function CasesScreen() {
-<<<<<<< HEAD
-  const { user } = useAuth();
-
-=======
   const { width } = useWindowDimensions();
   const isDesktop = width >= 900;
 
@@ -49,22 +38,13 @@ export default function CasesScreen() {
   // FORM STATE
   // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   const [showForm, setShowForm] = useState(false);
 
   const [caseNumber, setCaseNumber] = useState('');
   const [description, setDescription] = useState('');
-<<<<<<< HEAD
-  const [dueDate, setDueDate] = useState('');
-
-  const [organisations, setOrganisations] = useState([]);
-  const [fundingAgreements, setFundingAgreements] =
-    useState([]);
-=======
 
   const [organisations, setOrganisations] = useState([]);
   const [fundingAgreements, setFundingAgreements] = useState([]);
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   const [cases, setCases] = useState([]);
 
   const [selectedOrganisation, setSelectedOrganisation] =
@@ -83,8 +63,6 @@ export default function CasesScreen() {
   const [showFundingList, setShowFundingList] =
     useState(false);
 
-<<<<<<< HEAD
-=======
   // --------------------------------------------------
   // VALIDATION ERRORS
   // --------------------------------------------------
@@ -100,7 +78,6 @@ export default function CasesScreen() {
   // STATISTICS
   // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   const [stats, setStats] = useState({
     DRAFT: 0,
     'IN PROGRESS': 0,
@@ -109,8 +86,6 @@ export default function CasesScreen() {
     APPROVED: 0,
   });
 
-<<<<<<< HEAD
-=======
   // --------------------------------------------------
   // HELPERS
   // --------------------------------------------------
@@ -241,7 +216,6 @@ export default function CasesScreen() {
   // LOAD DATA
   // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -327,12 +301,8 @@ export default function CasesScreen() {
         agreementsResult.data || []
       );
 
-<<<<<<< HEAD
-      const loadedCases = casesResult.data || [];
-=======
       const loadedCases =
         casesResult.data || [];
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
       setCases(loadedCases);
 
@@ -374,26 +344,20 @@ export default function CasesScreen() {
     }
   }, []);
 
-<<<<<<< HEAD
-=======
   // --------------------------------------------------
   // LOAD WHEN SCREEN RECEIVES FOCUS
   // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   useFocusEffect(
     useCallback(() => {
       loadData();
     }, [loadData])
   );
 
-<<<<<<< HEAD
-=======
   // --------------------------------------------------
   // REFRESH
   // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   const refresh = async () => {
     setRefreshing(true);
 
@@ -404,62 +368,6 @@ export default function CasesScreen() {
     }
   };
 
-<<<<<<< HEAD
-  const selectOrganisation = (organisation) => {
-    setSelectedOrganisation(
-      organisation
-    );
-
-    setSelectedFundingAgreement(null);
-
-    setShowOrganisationList(false);
-    setShowFundingList(false);
-  };
-
-  const selectFundingAgreement = (
-    agreement
-  ) => {
-    setSelectedFundingAgreement(
-      agreement
-    );
-
-    setShowFundingList(false);
-  };
-
-  const createCase = async () => {
-    if (!caseNumber.trim()) {
-      Alert.alert(
-        'Missing Information',
-        'Please enter a case number.'
-      );
-      return;
-    }
-
-    if (!selectedOrganisation) {
-      Alert.alert(
-        'Missing Information',
-        'Please select an organisation.'
-      );
-      return;
-    }
-
-    if (!selectedFundingAgreement) {
-      Alert.alert(
-        'Missing Information',
-        'Please select a funding agreement.'
-      );
-      return;
-    }
-
-    if (!description.trim()) {
-      Alert.alert(
-        'Missing Information',
-        'Please enter a case description.'
-      );
-      return;
-    }
-
-=======
   // --------------------------------------------------
   // FORM VALIDATION
   // --------------------------------------------------
@@ -598,14 +506,11 @@ export default function CasesScreen() {
   // --------------------------------------------------
 
   const createCase = async () => {
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     if (!user?.id) {
       Alert.alert(
         'Authentication Error',
         'Your account could not be identified. Please sign in again.'
       );
-<<<<<<< HEAD
-=======
 
       return;
     }
@@ -618,32 +523,19 @@ export default function CasesScreen() {
         'Some fields contain missing or invalid information. Please correct the highlighted fields.'
       );
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       return;
     }
 
     if (
-<<<<<<< HEAD
-      selectedFundingAgreement.organisation_id !==
-      selectedOrganisation.id
-    ) {
-      Alert.alert(
-        'Invalid Funding Agreement',
-        'The selected funding agreement does not belong to the selected organisation.'
-      );
-=======
       !selectedOrganisation ||
       !selectedFundingAgreement
     ) {
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       return;
     }
 
     try {
       setSaving(true);
 
-<<<<<<< HEAD
-=======
       const cleanedCaseNumber =
         normaliseCaseNumber(
           caseNumber.trim()
@@ -667,23 +559,10 @@ export default function CasesScreen() {
         return;
       }
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       const { error } = await supabase
         .from('accountability_cases')
         .insert({
           case_number:
-<<<<<<< HEAD
-            caseNumber.trim(),
-
-          title:
-            caseNumber.trim(),
-
-          description:
-            description.trim(),
-
-          due_date:
-            dueDate.trim() || null,
-=======
             cleanedCaseNumber,
 
           title:
@@ -691,7 +570,6 @@ export default function CasesScreen() {
 
           description:
             cleanedDescription,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
           organisation_id:
             selectedOrganisation.id,
@@ -703,17 +581,9 @@ export default function CasesScreen() {
 
           priority: 'MEDIUM',
 
-<<<<<<< HEAD
-          created_by:
-            user.id,
-
-          responsible_user_id:
-            null,
-=======
           created_by: user.id,
 
           responsible_user_id: null,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
         });
 
       if (error) {
@@ -722,25 +592,10 @@ export default function CasesScreen() {
 
       Alert.alert(
         'Accountability Case Created',
-<<<<<<< HEAD
-        `Case ${caseNumber.trim()} has been created successfully.`
-      );
-
-      setCaseNumber('');
-      setDescription('');
-      setDueDate('');
-
-      setSelectedOrganisation(null);
-      setSelectedFundingAgreement(null);
-
-      setShowOrganisationList(false);
-      setShowFundingList(false);
-=======
         `Case ${cleanedCaseNumber} has been created successfully.`
       );
 
       resetForm();
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
       setShowForm(false);
 
@@ -751,13 +606,6 @@ export default function CasesScreen() {
         error
       );
 
-<<<<<<< HEAD
-      Alert.alert(
-        'Unable to Create Case',
-        error?.message ||
-          'The accountability case could not be created.'
-      );
-=======
       // Handle duplicate constraint.
       if (
         error?.code === '23505'
@@ -779,14 +627,11 @@ export default function CasesScreen() {
             'The accountability case could not be created.'
         );
       }
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     } finally {
       setSaving(false);
     }
   };
 
-<<<<<<< HEAD
-=======
   // --------------------------------------------------
   // CANCEL FORM
   // --------------------------------------------------
@@ -805,7 +650,6 @@ export default function CasesScreen() {
   // FILTER FUNDING AGREEMENTS
   // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   const filteredFundingAgreements =
     selectedOrganisation
       ? fundingAgreements.filter(
@@ -815,13 +659,10 @@ export default function CasesScreen() {
         )
       : [];
 
-<<<<<<< HEAD
-=======
   // --------------------------------------------------
   // RENDER
   // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   return (
     <ProtectedRoute
       allowedRoles={[
@@ -830,13 +671,6 @@ export default function CasesScreen() {
     >
       <SafeAreaView style={styles.safeArea}>
         <StatusBar
-<<<<<<< HEAD
-          barStyle="light-content"
-          backgroundColor="#111111"
-        />
-
-        <ScrollView
-=======
           barStyle="dark-content"
           backgroundColor="#FFFFFF"
         />
@@ -845,26 +679,10 @@ export default function CasesScreen() {
           style={styles.container}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={refresh}
-<<<<<<< HEAD
-            />
-          }
-        >
-          <View style={styles.flagStrip}>
-            <View style={styles.black} />
-            <View style={styles.gold} />
-            <View style={styles.green} />
-            <View style={styles.blue} />
-            <View style={styles.red} />
-          </View>
-
-          <View style={styles.header}>
-            <Pressable
-=======
               tintColor="#D97706"
               colors={['#D97706']}
             />
@@ -1033,23 +851,12 @@ export default function CasesScreen() {
           <View style={styles.navigation}>
             <Pressable
               style={styles.navItem}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               onPress={() =>
                 router.replace(
                   '/dsac/dashboard'
                 )
               }
             >
-<<<<<<< HEAD
-              <Text style={styles.back}>
-                ← Dashboard
-              </Text>
-            </Pressable>
-
-            <View>
-              <Text style={styles.brand}>
-                CIVITRACK
-=======
               <Text style={styles.navText}>
                 HOME
               </Text>
@@ -1080,26 +887,12 @@ export default function CasesScreen() {
                 }
               >
                 ACCOUNTABILITY
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               </Text>
 
               <Text style={styles.subtitle}>
                 DSAC Accountability Cases
               </Text>
             </View>
-<<<<<<< HEAD
-          </View>
-
-          <View style={styles.main}>
-            <View style={styles.heading}>
-              <View
-                style={
-                  styles.headingContent
-                }
-              >
-                <Text style={styles.title}>
-                  Accountability Cases
-=======
 
             <Pressable
               style={styles.navItem}
@@ -1182,37 +975,20 @@ export default function CasesScreen() {
 
                 <Text style={styles.pageTitle}>
                   ACCOUNTABILITY CASES
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 </Text>
 
                 <Text
                   style={
-<<<<<<< HEAD
-                    styles.description
-                  }
-                >
-                  Create, assign and monitor
-                  accountability cases linked
-                  to funding agreements.
-=======
                     styles.pageDescription
                   }
                 >
                   Create, monitor and manage
                   accountability cases linked to
                   organisations and funding agreements.
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 </Text>
               </View>
 
               <Pressable
-<<<<<<< HEAD
-                style={styles.createButton}
-                onPress={() =>
-                  setShowForm(
-                    !showForm
-                  )
-=======
                 style={({ pressed }) => [
                   styles.createButton,
                   pressed &&
@@ -1220,7 +996,6 @@ export default function CasesScreen() {
                 ]}
                 onPress={() =>
                   setShowForm(!showForm)
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 }
               >
                 <Text
@@ -1228,27 +1003,13 @@ export default function CasesScreen() {
                     styles.createButtonText
                   }
                 >
-<<<<<<< HEAD
-                  + CREATE CASE
-=======
                   {showForm
                     ? '− CLOSE FORM'
                     : '+ CREATE CASE'}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 </Text>
               </Pressable>
             </View>
 
-<<<<<<< HEAD
-            {showForm && (
-              <View style={styles.form}>
-                <View style={styles.formTop} />
-
-                <Text
-                  style={styles.formTitle}
-                >
-                  Create Accountability Case
-=======
             {/* CREATE CASE FORM */}
 
             {showForm && (
@@ -1870,21 +1631,10 @@ export default function CasesScreen() {
                   }
                 >
                   ACCOUNTABILITY MANAGEMENT
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 </Text>
 
                 <Text
                   style={
-<<<<<<< HEAD
-                    styles.formDescription
-                  }
-                >
-                  A case becomes the main
-                  accountability workspace
-                  for an organisation.
-                </Text>
-
-=======
                     styles.infoText
                   }
                 >
@@ -1896,32 +1646,20 @@ export default function CasesScreen() {
 
                 {/* SECONDARY CASE NUMBER */}
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <Text style={styles.label}>
                   CASE NUMBER *
                 </Text>
 
                 <TextInput
-<<<<<<< HEAD
-                  style={styles.input}
-=======
                   style={[
                     styles.input,
                     errors.caseNumber &&
                       styles.inputError,
                   ]}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   placeholder="e.g. DSAC-CASE-2026-001"
                   placeholderTextColor="#888888"
                   value={caseNumber}
                   onChangeText={
-<<<<<<< HEAD
-                    setCaseNumber
-                  }
-                  autoCapitalize="characters"
-                />
-
-=======
                     handleCaseNumberChange
                   }
                   autoCapitalize="characters"
@@ -1949,7 +1687,6 @@ export default function CasesScreen() {
 
                 {/* SECONDARY ORGANISATION */}
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <Text style={styles.label}>
                   ORGANISATION *
                 </Text>
@@ -1959,11 +1696,8 @@ export default function CasesScreen() {
                     styles.selectInput,
                     showOrganisationList &&
                       styles.selectInputActive,
-<<<<<<< HEAD
-=======
                     errors.organisation &&
                       styles.inputError,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   ]}
                   onPress={() =>
                     setShowOrganisationList(
@@ -1994,8 +1728,6 @@ export default function CasesScreen() {
                   </Text>
                 </Pressable>
 
-<<<<<<< HEAD
-=======
                 {errors.organisation && (
                   <Text
                     style={
@@ -2006,7 +1738,6 @@ export default function CasesScreen() {
                   </Text>
                 )}
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 {showOrganisationList && (
                   <View
                     style={
@@ -2020,12 +1751,7 @@ export default function CasesScreen() {
                           styles.dropdownEmpty
                         }
                       >
-<<<<<<< HEAD
-                        No organisations
-                        available.
-=======
                         No organisations available.
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                       </Text>
                     ) : (
                       organisations.map(
@@ -2075,11 +1801,8 @@ export default function CasesScreen() {
                   </View>
                 )}
 
-<<<<<<< HEAD
-=======
                 {/* SECONDARY FUNDING AGREEMENT */}
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <Text style={styles.label}>
                   FUNDING AGREEMENT *
                 </Text>
@@ -2089,11 +1812,8 @@ export default function CasesScreen() {
                     styles.selectInput,
                     !selectedOrganisation &&
                       styles.disabledInput,
-<<<<<<< HEAD
-=======
                     errors.fundingAgreement &&
                       styles.inputError,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   ]}
                   disabled={
                     !selectedOrganisation
@@ -2131,8 +1851,6 @@ export default function CasesScreen() {
                   </Text>
                 </Pressable>
 
-<<<<<<< HEAD
-=======
                 {errors.fundingAgreement && (
                   <Text
                     style={
@@ -2145,7 +1863,6 @@ export default function CasesScreen() {
                   </Text>
                 )}
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 {showFundingList &&
                   selectedOrganisation && (
                     <View
@@ -2160,14 +1877,8 @@ export default function CasesScreen() {
                             styles.dropdownEmpty
                           }
                         >
-<<<<<<< HEAD
-                          No funding agreements
-                          found for this
-                          organisation.
-=======
                           No funding agreements found
                           for this organisation.
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                         </Text>
                       ) : (
                         filteredFundingAgreements.map(
@@ -2207,14 +1918,10 @@ export default function CasesScreen() {
 
                                 {agreement.allocated_amount !==
                                 null
-<<<<<<< HEAD
-                                  ? ` • ${agreement.currency || 'ZAR'} ${Number(
-=======
                                   ? ` • ${
                                       agreement.currency ||
                                       'ZAR'
                                     } ${Number(
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                                       agreement.allocated_amount
                                     ).toLocaleString(
                                       'en-ZA'
@@ -2228,11 +1935,8 @@ export default function CasesScreen() {
                     </View>
                   )}
 
-<<<<<<< HEAD
-=======
                 {/* SECONDARY DESCRIPTION */}
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <Text style={styles.label}>
                   CASE DESCRIPTION *
                 </Text>
@@ -2241,35 +1945,13 @@ export default function CasesScreen() {
                   style={[
                     styles.input,
                     styles.textArea,
-<<<<<<< HEAD
-=======
                     errors.description &&
                       styles.inputError,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   ]}
                   placeholder="Describe the accountability requirements..."
                   placeholderTextColor="#888888"
                   value={description}
                   onChangeText={
-<<<<<<< HEAD
-                    setDescription
-                  }
-                  multiline
-                  textAlignVertical="top"
-                />
-
-                <Text style={styles.label}>
-                  DUE DATE
-                </Text>
-
-                <TextInput
-                  style={styles.input}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor="#888888"
-                  value={dueDate}
-                  onChangeText={setDueDate}
-                />
-=======
                     handleDescriptionChange
                   }
                   multiline
@@ -2310,18 +1992,11 @@ export default function CasesScreen() {
                 </View>
 
                 {/* ACTION BUTTONS */}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
                 <View style={styles.actions}>
                   <Pressable
                     style={styles.cancel}
-<<<<<<< HEAD
-                    onPress={() =>
-                      setShowForm(false)
-                    }
-=======
                     onPress={cancelForm}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                     disabled={saving}
                   >
                     <Text
@@ -2339,13 +2014,9 @@ export default function CasesScreen() {
                       saving &&
                         styles.saveDisabled,
                     ]}
-<<<<<<< HEAD
-                    onPress={createCase}
-=======
                     onPress={
                       createCase
                     }
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                     disabled={saving}
                   >
                     {saving ? (
@@ -2365,9 +2036,6 @@ export default function CasesScreen() {
                   </Pressable>
                 </View>
               </View>
-<<<<<<< HEAD
-            )}
-=======
             </View>
 
             {/* STATISTICS */}
@@ -2403,25 +2071,16 @@ export default function CasesScreen() {
             </View>
 
             {/* LOADING */}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 
             {loading ? (
               <View
                 style={
-<<<<<<< HEAD
-                  styles.loadingContainer
-=======
                   styles.loadingState
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 }
               >
                 <ActivityIndicator
                   size="large"
-<<<<<<< HEAD
-                  color="#007A4D"
-=======
                   color="#D97706"
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 />
 
                 <Text
@@ -2429,24 +2088,11 @@ export default function CasesScreen() {
                     styles.loadingText
                   }
                 >
-<<<<<<< HEAD
-                  Loading accountability
-                  cases...
-=======
                   Loading accountability cases...
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 </Text>
               </View>
             ) : (
               <>
-<<<<<<< HEAD
-                <View
-                  style={styles.statusGrid}
-                >
-                  <StatusCard
-                    label="DRAFT"
-                    number={stats.DRAFT}
-=======
                 {/* STATUS CARDS */}
 
                 <View
@@ -2462,37 +2108,26 @@ export default function CasesScreen() {
                       stats.DRAFT
                     }
                     accent="#777777"
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   />
 
                   <StatusCard
                     label="IN PROGRESS"
                     number={
-<<<<<<< HEAD
-                      stats['IN PROGRESS']
-                    }
-=======
                       stats[
                         'IN PROGRESS'
                       ]
                     }
                     accent="#007A4D"
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   />
 
                   <StatusCard
                     label="UNDER REVIEW"
                     number={
-<<<<<<< HEAD
-                      stats['UNDER REVIEW']
-                    }
-=======
                       stats[
                         'UNDER REVIEW'
                       ]
                     }
                     accent="#003DA5"
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   />
 
                   <StatusCard
@@ -2502,10 +2137,7 @@ export default function CasesScreen() {
                         'ACTION REQUIRED'
                       ]
                     }
-<<<<<<< HEAD
-=======
                     accent="#D97706"
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   />
 
                   <StatusCard
@@ -2513,26 +2145,6 @@ export default function CasesScreen() {
                     number={
                       stats.APPROVED
                     }
-<<<<<<< HEAD
-                  />
-                </View>
-
-                <Text
-                  style={
-                    styles.sectionTitle
-                  }
-                >
-                  ACCOUNTABILITY CASES
-                </Text>
-
-                {cases.length === 0 ? (
-                  <View
-                    style={styles.empty}
-                  >
-                    <View
-                      style={
-                        styles.caseIcon
-=======
                     accent="#007A4D"
                   />
                 </View>
@@ -2578,16 +2190,11 @@ export default function CasesScreen() {
                     <View
                       style={
                         styles.emptyIcon
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                       }
                     >
                       <Text
                         style={
-<<<<<<< HEAD
-                          styles.caseIconText
-=======
                           styles.emptyIconText
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                         }
                       >
                         C
@@ -2599,11 +2206,7 @@ export default function CasesScreen() {
                         styles.emptyTitle
                       }
                     >
-<<<<<<< HEAD
-                      No accountability cases
-=======
                       NO ACCOUNTABILITY CASES
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                     </Text>
 
                     <Text
@@ -2611,15 +2214,8 @@ export default function CasesScreen() {
                         styles.emptyText
                       }
                     >
-<<<<<<< HEAD
-                      Create a case after an
-                      organisation and
-                      funding agreement have
-                      been established.
-=======
                       Create a case after an organisation
                       and funding agreement have been established.
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                     </Text>
 
                     <View
@@ -2667,8 +2263,6 @@ export default function CasesScreen() {
                         Accountability Case
                       </Text>
                     </View>
-<<<<<<< HEAD
-=======
 
                     <Pressable
                       style={({ pressed }) => [
@@ -2688,7 +2282,6 @@ export default function CasesScreen() {
                         CREATE FIRST CASE
                       </Text>
                     </Pressable>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   </View>
                 ) : (
                   <View
@@ -2699,17 +2292,12 @@ export default function CasesScreen() {
                     {cases.map(
                       (item) => (
                         <CaseCard
-<<<<<<< HEAD
-                          key={item.id}
-                          item={item}
-=======
                           key={
                             item.id
                           }
                           item={
                             item
                           }
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                         />
                       )
                     )}
@@ -2718,8 +2306,6 @@ export default function CasesScreen() {
               </>
             )}
           </View>
-<<<<<<< HEAD
-=======
 
           {/* FOOTER */}
 
@@ -2806,23 +2392,12 @@ export default function CasesScreen() {
               </Text>
             </View>
           </View>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
         </ScrollView>
       </SafeAreaView>
     </ProtectedRoute>
   );
 }
 
-<<<<<<< HEAD
-function StatusCard({
-  label,
-  number,
-}) {
-  return (
-    <View style={styles.statusCard}>
-      <Text
-        style={styles.statusLabel}
-=======
 // --------------------------------------------------
 // STATUS CARD
 // --------------------------------------------------
@@ -2846,19 +2421,14 @@ function StatusCard({
         style={
           styles.statusLabel
         }
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       >
         {label}
       </Text>
 
       <Text
-<<<<<<< HEAD
-        style={styles.statusNumber}
-=======
         style={
           styles.statusNumber
         }
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       >
         {number}
       </Text>
@@ -2866,13 +2436,10 @@ function StatusCard({
   );
 }
 
-<<<<<<< HEAD
-=======
 // --------------------------------------------------
 // CASE CARD
 // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 function CaseCard({ item }) {
   const organisationName =
     item.organisations?.name ||
@@ -2883,11 +2450,6 @@ function CaseCard({ item }) {
       ?.agreement_number ||
     'Funding Agreement';
 
-<<<<<<< HEAD
-  return (
-    <Pressable
-      style={styles.caseCard}
-=======
   const statusStyle =
     getStatusStyle(
       item.status
@@ -2900,106 +2462,12 @@ function CaseCard({ item }) {
         pressed &&
           styles.caseCardPressed,
       ]}
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       onPress={() =>
         router.push(
           `/cases/${item.id}`
         )
       }
     >
-<<<<<<< HEAD
-      <View style={styles.caseCardHeader}>
-        <View
-          style={
-            styles.caseCardHeading
-          }
-        >
-          <Text
-            style={
-              styles.caseNumber
-            }
-          >
-            {item.case_number}
-          </Text>
-
-          <Text
-            style={
-              styles.caseTitle
-            }
-          >
-            {item.title ||
-              'Accountability Case'}
-          </Text>
-        </View>
-
-        <View
-          style={[
-            styles.statusBadge,
-            getStatusStyle(
-              item.status
-            ),
-          ]}
-        >
-          <Text
-            style={
-              styles.statusBadgeText
-            }
-          >
-            {item.status}
-          </Text>
-        </View>
-      </View>
-
-      <Text
-        style={
-          styles.caseDescription
-        }
-        numberOfLines={2}
-      >
-        {item.description ||
-          'No description provided.'}
-      </Text>
-
-      <View
-        style={
-          styles.caseMeta
-        }
-      >
-        <Text
-          style={
-            styles.caseMetaText
-          }
-        >
-          Organisation: {organisationName}
-        </Text>
-
-        <Text
-          style={
-            styles.caseMetaText
-          }
-        >
-          Agreement: {agreementNumber}
-        </Text>
-
-        <Text
-          style={
-            styles.caseMetaText
-          }
-        >
-          Priority:{' '}
-          {item.priority ||
-            'MEDIUM'}
-        </Text>
-      </View>
-
-      <Text
-        style={
-          styles.viewCase
-        }
-      >
-        VIEW CASE →
-      </Text>
-=======
       <View
         style={[
           styles.caseCardAccent,
@@ -3176,198 +2644,78 @@ function CaseCard({ item }) {
           </Text>
         </View>
       </View>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     </Pressable>
   );
 }
 
-<<<<<<< HEAD
-=======
 // --------------------------------------------------
 // STATUS STYLE
 // --------------------------------------------------
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 function getStatusStyle(status) {
   switch (status) {
     case 'APPROVED':
       return {
         backgroundColor:
           '#E8F3EE',
-<<<<<<< HEAD
-=======
         dotColor:
           '#007A4D',
         accent: {
           backgroundColor:
             '#007A4D',
         },
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       };
 
     case 'ACTION REQUIRED':
       return {
         backgroundColor:
           '#FFF3CD',
-<<<<<<< HEAD
-=======
         dotColor:
           '#D97706',
         accent: {
           backgroundColor:
             '#D97706',
         },
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       };
 
     case 'UNDER REVIEW':
       return {
         backgroundColor:
           '#E8F0F7',
-<<<<<<< HEAD
-=======
         dotColor:
           '#003DA5',
         accent: {
           backgroundColor:
             '#003DA5',
         },
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       };
 
     case 'IN PROGRESS':
       return {
         backgroundColor:
           '#E8F3EE',
-<<<<<<< HEAD
-=======
         dotColor:
           '#007A4D',
         accent: {
           backgroundColor:
             '#007A4D',
         },
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       };
 
     default:
       return {
         backgroundColor:
           '#F0F0F0',
-<<<<<<< HEAD
-=======
         dotColor:
           '#777777',
         accent: {
           backgroundColor:
             '#777777',
         },
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       };
   }
 }
 
-<<<<<<< HEAD
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F3F3F0',
-  },
-
-  flagStrip: {
-    height: 7,
-    flexDirection: 'row',
-  },
-
-  black: {
-    flex: 1,
-    backgroundColor: '#111111',
-  },
-
-  gold: {
-    flex: 1,
-    backgroundColor: '#FFB81C',
-  },
-
-  green: {
-    flex: 2,
-    backgroundColor: '#007A4D',
-  },
-
-  blue: {
-    flex: 1,
-    backgroundColor: '#001489',
-  },
-
-  red: {
-    flex: 1,
-    backgroundColor: '#DE3831',
-  },
-
-  header: {
-    backgroundColor: '#111111',
-    padding: 22,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  back: {
-    color: '#FFB81C',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-
-  brand: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '900',
-    letterSpacing: 1.5,
-    textAlign: 'right',
-  },
-
-  subtitle: {
-    color: '#AAAAAA',
-    fontSize: 10,
-    marginTop: 3,
-  },
-
-  main: {
-    width: '100%',
-    maxWidth: 1200,
-    alignSelf: 'center',
-    padding: 30,
-  },
-
-  heading: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 25,
-  },
-
-  headingContent: {
-    flex: 1,
-  },
-
-  title: {
-    color: '#171717',
-    fontSize: 28,
-    fontWeight: '900',
-  },
-
-  description: {
-    color: '#666666',
-    fontSize: 13,
-    marginTop: 7,
-  },
-
-  createButton: {
-    backgroundColor: '#007A4D',
-    paddingHorizontal: 18,
-    paddingVertical: 13,
-    marginLeft: 20,
-=======
 // --------------------------------------------------
 // STYLES
 // --------------------------------------------------
@@ -3755,72 +3103,10 @@ const styles = StyleSheet.create({
 
   createButtonPressed: {
     opacity: 0.75,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   createButtonText: {
     color: '#FFFFFF',
-<<<<<<< HEAD
-    fontSize: 10,
-    fontWeight: '900',
-  },
-
-  form: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DDDDDD',
-    padding: 25,
-    marginBottom: 25,
-    overflow: 'hidden',
-  },
-
-  formTop: {
-    height: 5,
-    backgroundColor: '#111111',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-  },
-
-  formTitle: {
-    marginTop: 5,
-    color: '#222222',
-    fontSize: 21,
-    fontWeight: '900',
-  },
-
-  formDescription: {
-    color: '#777777',
-    fontSize: 12,
-    marginTop: 5,
-  },
-
-  label: {
-    color: '#333333',
-    fontSize: 10,
-    fontWeight: '900',
-    marginTop: 14,
-    marginBottom: 7,
-  },
-
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    backgroundColor: '#FAFAFA',
-    paddingHorizontal: 13,
-    color: '#222222',
-    fontSize: 14,
-  },
-
-  selectInput: {
-    minHeight: 48,
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    backgroundColor: '#FAFAFA',
-    paddingHorizontal: 13,
-=======
     fontSize: 9,
     fontWeight: '900',
     letterSpacing: 0.3,
@@ -3961,19 +3247,14 @@ const styles = StyleSheet.create({
     borderColor: '#D7D7D7',
     backgroundColor: '#FAFAFA',
     paddingHorizontal: 12,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
 
   selectInputActive: {
-<<<<<<< HEAD
-    borderColor: '#123B63',
-=======
     borderColor: '#D97706',
     backgroundColor: '#FFFDF8',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   disabledInput: {
@@ -3983,46 +3264,28 @@ const styles = StyleSheet.create({
 
   selectText: {
     color: '#222222',
-<<<<<<< HEAD
-    fontSize: 14,
-=======
     fontSize: 11,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     flex: 1,
     paddingRight: 10,
   },
 
   placeholderText: {
-<<<<<<< HEAD
-    color: '#888888',
-    fontSize: 14,
-=======
     color: '#999999',
     fontSize: 11,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     flex: 1,
     paddingRight: 10,
   },
 
   selectArrow: {
-<<<<<<< HEAD
-    color: '#007A4D',
-    fontSize: 11,
-=======
     color: '#D97706',
     fontSize: 9,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     fontWeight: '900',
   },
 
   dropdown: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-<<<<<<< HEAD
-    borderColor: '#CCCCCC',
-=======
     borderColor: '#D7D7D7',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     borderTopWidth: 0,
     maxHeight: 220,
   },
@@ -4036,47 +3299,23 @@ const styles = StyleSheet.create({
 
   dropdownItemTitle: {
     color: '#222222',
-<<<<<<< HEAD
-    fontSize: 13,
-    fontWeight: '800',
-=======
     fontSize: 10,
     fontWeight: '900',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   dropdownItemSubtitle: {
     color: '#777777',
-<<<<<<< HEAD
-    fontSize: 11,
-=======
     fontSize: 8,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     marginTop: 4,
   },
 
   dropdownEmpty: {
     color: '#777777',
-<<<<<<< HEAD
-    fontSize: 12,
-=======
     fontSize: 9,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     padding: 15,
     textAlign: 'center',
   },
 
-<<<<<<< HEAD
-  textArea: {
-    height: 110,
-    paddingTop: 13,
-  },
-
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-=======
   /* WORKFLOW */
 
   workflowNotice: {
@@ -4239,51 +3478,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     marginTop: 25,
   },
 
   cancel: {
     borderWidth: 1,
-<<<<<<< HEAD
-    borderColor: '#CCCCCC',
-    paddingHorizontal: 20,
-    paddingVertical: 13,
-  },
-
-  cancelText: {
-    color: '#555555',
-    fontSize: 10,
-    fontWeight: '900',
-  },
-
-  save: {
-    backgroundColor: '#007A4D',
-    paddingHorizontal: 20,
-    paddingVertical: 13,
-    minWidth: 130,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  saveDisabled: {
-    opacity: 0.7,
-  },
-
-  saveText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '900',
-  },
-
-  loadingContainer: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DDDDDD',
-    padding: 45,
-    alignItems: 'center',
-    marginBottom: 30,
-=======
     borderColor: '#E4E4E4',
     paddingHorizontal: 16,
     paddingVertical: 11,
@@ -4310,68 +3509,39 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E2E2',
     marginBottom: 20,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   loadingText: {
     color: '#777777',
-<<<<<<< HEAD
-    fontSize: 12,
-    marginTop: 12,
-  },
-
-=======
     fontSize: 10,
     marginTop: 10,
   },
 
   /* STATS */
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   statusGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-<<<<<<< HEAD
-    marginBottom: 30,
-=======
     marginBottom: 25,
   },
 
   statusGridDesktop: {
     flexWrap: 'nowrap',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   statusCard: {
     flex: 1,
-<<<<<<< HEAD
-    minWidth: 150,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DDDDDD',
-    padding: 17,
-=======
     minWidth: 145,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E1E1E1',
     borderTopWidth: 4,
     padding: 16,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   statusLabel: {
     color: '#777777',
-<<<<<<< HEAD
-    fontSize: 9,
-    fontWeight: '900',
-  },
-
-  statusNumber: {
-    color: '#111111',
-    fontSize: 27,
-=======
     fontSize: 8,
     fontWeight: '900',
     letterSpacing: 0.4,
@@ -4380,41 +3550,10 @@ const styles = StyleSheet.create({
   statusNumber: {
     color: '#222222',
     fontSize: 26,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     fontWeight: '900',
     marginTop: 8,
   },
 
-<<<<<<< HEAD
-  sectionTitle: {
-    color: '#333333',
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 1,
-    marginBottom: 12,
-  },
-
-  empty: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DDDDDD',
-    padding: 45,
-    alignItems: 'center',
-  },
-
-  caseIcon: {
-    width: 45,
-    height: 45,
-    borderRadius: 23,
-    backgroundColor: '#111111',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  caseIconText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-=======
   /* EMPTY */
 
   emptyState: {
@@ -4441,31 +3580,10 @@ const styles = StyleSheet.create({
   emptyIconText: {
     color: '#888888',
     fontSize: 20,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     fontWeight: '900',
   },
 
   emptyTitle: {
-<<<<<<< HEAD
-    color: '#222222',
-    fontSize: 17,
-    fontWeight: '900',
-    marginTop: 15,
-  },
-
-  emptyText: {
-    color: '#777777',
-    fontSize: 12,
-    textAlign: 'center',
-    maxWidth: 500,
-    marginTop: 7,
-  },
-
-  workflow: {
-    marginTop: 25,
-    padding: 15,
-    backgroundColor: '#F5F5F2',
-=======
     color: '#333333',
     fontSize: 12,
     fontWeight: '900',
@@ -4503,37 +3621,20 @@ const styles = StyleSheet.create({
     marginTop: 22,
     padding: 14,
     backgroundColor: '#F8F8F5',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
     justifyContent: 'center',
-<<<<<<< HEAD
-    gap: 10,
-=======
     gap: 9,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   workflowText: {
     color: '#007A4D',
-<<<<<<< HEAD
-    fontSize: 11,
-=======
     fontSize: 9,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     fontWeight: '900',
   },
 
   workflowArrow: {
-<<<<<<< HEAD
-    color: '#FFB81C',
-    fontSize: 18,
-    fontWeight: '900',
-  },
-
-  caseList: {
-=======
     color: '#D97706',
     fontSize: 17,
     fontWeight: '900',
@@ -4543,17 +3644,12 @@ const styles = StyleSheet.create({
 
   caseList: {
     width: '100%',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     gap: 12,
   },
 
   caseCard: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-<<<<<<< HEAD
-    borderColor: '#DDDDDD',
-    padding: 20,
-=======
     borderColor: '#E1E1E1',
     overflow: 'hidden',
   },
@@ -4569,7 +3665,6 @@ const styles = StyleSheet.create({
 
   caseCardInner: {
     padding: 16,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   caseCardHeader: {
@@ -4584,35 +3679,20 @@ const styles = StyleSheet.create({
   },
 
   caseNumber: {
-<<<<<<< HEAD
-    color: '#007A4D',
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 0.8,
-=======
     color: '#D97706',
     fontSize: 9,
     fontWeight: '900',
     letterSpacing: 0.6,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   caseTitle: {
     color: '#222222',
-<<<<<<< HEAD
-    fontSize: 17,
-=======
     fontSize: 14,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     fontWeight: '900',
     marginTop: 5,
   },
 
   statusBadge: {
-<<<<<<< HEAD
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-=======
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 9,
@@ -4625,51 +3705,23 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     marginRight: 5,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   statusBadgeText: {
     color: '#333333',
-<<<<<<< HEAD
-    fontSize: 8,
-=======
     fontSize: 7,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     fontWeight: '900',
   },
 
   caseDescription: {
     color: '#666666',
-<<<<<<< HEAD
-    fontSize: 12,
-    lineHeight: 18,
-=======
     fontSize: 9,
     lineHeight: 15,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     marginTop: 12,
   },
 
   caseMeta: {
     marginTop: 15,
-<<<<<<< HEAD
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
-    gap: 5,
-  },
-
-  caseMetaText: {
-    color: '#777777',
-    fontSize: 10,
-  },
-
-  viewCase: {
-    color: '#007A4D',
-    fontSize: 9,
-    fontWeight: '900',
-    marginTop: 15,
-=======
     paddingTop: 13,
     borderTopWidth: 1,
     borderTopColor: '#EEEEEE',
@@ -4799,6 +3851,5 @@ const styles = StyleSheet.create({
     color: '#666666',
     fontSize: 7,
     marginTop: 5,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 });

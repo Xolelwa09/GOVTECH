@@ -1,19 +1,9 @@
-<<<<<<< HEAD
-import { useCallback, useState } from 'react';
-
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  RefreshControl,
-=======
 import { useState } from 'react';
 
 import {
   Alert,
   Modal,
   Pressable,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -23,191 +13,6 @@ import {
   View,
 } from 'react-native';
 
-<<<<<<< HEAD
-import { router, useFocusEffect } from 'expo-router';
-
-import ProtectedRoute from '../../src/components/ProtectedRoute';
-import { useAuth } from '../../src/contexts/AuthContext';
-import { supabase } from '../../src/services/supabase';
-import { ROLES } from '../../src/constants/roles';
-
-export default function FundingAgreementsScreen() {
-  const { user } = useAuth();
-
-  const [showForm, setShowForm] = useState(false);
-
-  const [agreementNumber, setAgreementNumber] = useState('');
-  const [amount, setAmount] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-
-  const [organisations, setOrganisations] = useState([]);
-  const [selectedOrganisation, setSelectedOrganisation] = useState(null);
-  const [showOrganisationList, setShowOrganisationList] = useState(false);
-
-  const [agreements, setAgreements] = useState([]);
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-
-  /*
-   * Load organisations and funding agreements from Supabase
-   */
-  const loadData = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const [organisationsResult, agreementsResult] = await Promise.all([
-        supabase
-          .from('organisations')
-          .select('id, name')
-          .order('name', { ascending: true }),
-
-        supabase
-          .from('funding_agreements')
-          .select(
-            `
-              id,
-              organisation_id,
-              agreement_number,
-              title,
-              allocated_amount,
-              currency,
-              status,
-              start_date,
-              end_date,
-              created_at,
-              organisations ( id, name )
-            `
-          )
-          .order('created_at', { ascending: false }),
-      ]);
-
-      if (organisationsResult.error) {
-        throw organisationsResult.error;
-      }
-
-      if (agreementsResult.error) {
-        throw agreementsResult.error;
-      }
-
-      setOrganisations(organisationsResult.data || []);
-      setAgreements(agreementsResult.data || []);
-    } catch (error) {
-      console.error('Funding agreements loading error:', error);
-
-      Alert.alert(
-        'Unable to Load',
-        'Funding agreements could not be loaded from Supabase.'
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [loadData])
-  );
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadData();
-  };
-
-  const saveAgreement = async () => {
-    if (!agreementNumber.trim()) {
-      Alert.alert('Missing Information', 'Please enter an agreement number.');
-      return;
-    }
-
-    if (!selectedOrganisation) {
-      Alert.alert('Missing Information', 'Please select an organisation.');
-      return;
-    }
-
-    const numericAmount = Number(amount.replace(/[^0-9.]/g, ''));
-
-    if (!amount || Number.isNaN(numericAmount) || numericAmount <= 0) {
-      Alert.alert('Missing Information', 'Please enter a valid funding amount.');
-      return;
-    }
-
-    if (!startDate || !endDate) {
-      Alert.alert('Missing Information', 'Please complete both the start and end dates.');
-      return;
-    }
-
-    if (!user?.id) {
-      Alert.alert(
-        'Authentication Error',
-        'Your account could not be identified. Please sign in again.'
-      );
-      return;
-    }
-
-    try {
-      setSaving(true);
-
-      const { error } = await supabase.from('funding_agreements').insert({
-        agreement_number: agreementNumber.trim(),
-        title: agreementNumber.trim(),
-        organisation_id: selectedOrganisation.id,
-        allocated_amount: numericAmount,
-        currency: 'ZAR',
-        start_date: startDate.trim(),
-        end_date: endDate.trim(),
-        status: 'ACTIVE',
-        created_by: user.id,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      Alert.alert(
-        'Funding Agreement Created',
-        `Agreement ${agreementNumber.trim()} has been saved to CIVITRACK.`
-      );
-
-      setAgreementNumber('');
-      setAmount('');
-      setStartDate('');
-      setEndDate('');
-      setSelectedOrganisation(null);
-      setShowOrganisationList(false);
-      setShowForm(false);
-
-      await loadData();
-    } catch (error) {
-      console.error('Create funding agreement error:', error);
-
-      Alert.alert(
-        'Unable to Create Agreement',
-        error?.message || 'The funding agreement could not be created.'
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const activeCount = agreements.filter((a) => a.status === 'ACTIVE').length;
-  const pendingCount = agreements.filter(
-    (a) => a.status === 'DRAFT' || a.status === 'PENDING'
-  ).length;
-  const totalAllocation = agreements.reduce(
-    (sum, a) => sum + (Number(a.allocated_amount) || 0),
-    0
-  );
-
-  return (
-    <ProtectedRoute allowedRoles={[ROLES.DSAC_ADMIN]}>
-    <SafeAreaView style={styles.safeArea}>
-
-=======
 import { router } from 'expo-router';
 
 export default function FundingAgreementsScreen() {
@@ -634,7 +439,6 @@ export default function FundingAgreementsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
       <StatusBar
         barStyle="light-content"
         backgroundColor="#18202A"
@@ -643,69 +447,28 @@ export default function FundingAgreementsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
-<<<<<<< HEAD
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-
-        {/* ================================================= */}
-        {/* SOUTH AFRICAN COLOUR STRIP */}
-        {/* ================================================= */}
-
-        <View style={styles.flagStrip}>
-
-=======
       >
         {/* SOUTH AFRICAN COLOUR STRIP */}
         <View style={styles.flagStrip}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
           <View style={styles.flagBlack} />
           <View style={styles.flagGold} />
           <View style={styles.flagGreen} />
           <View style={styles.flagBlue} />
           <View style={styles.flagRed} />
-<<<<<<< HEAD
-
-        </View>
-
-
-        {/* ================================================= */}
-        {/* GOVERNMENT MASTHEAD */}
-        {/* ================================================= */}
-
-        <View style={styles.govHeader}>
-
-          <View style={styles.govIdentity}>
-
-            {/* Temporary RSA emblem */}
-            <View style={styles.emblemContainer}>
-
-=======
         </View>
 
         {/* GOVERNMENT HEADER */}
         <View style={styles.govHeader}>
           <View style={styles.govIdentity}>
             <View style={styles.emblemContainer}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <View style={styles.emblem}>
                 <Text style={styles.emblemText}>
                   RSA
                 </Text>
               </View>
-<<<<<<< HEAD
-
-            </View>
-
-
-            <View style={styles.govText}>
-
-=======
             </View>
 
             <View style={styles.govText}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <Text style={styles.republic}>
                 REPUBLIC OF SOUTH AFRICA
               </Text>
@@ -719,24 +482,6 @@ export default function FundingAgreementsScreen() {
               <Text style={styles.nationalDepartment}>
                 National Department
               </Text>
-<<<<<<< HEAD
-
-            </View>
-
-          </View>
-
-        </View>
-
-
-        {/* ================================================= */}
-        {/* CIVITRACK SYSTEM BAR */}
-        {/* ================================================= */}
-
-        <View style={styles.systemBar}>
-
-          <View style={styles.systemIdentity}>
-
-=======
             </View>
           </View>
         </View>
@@ -744,7 +489,6 @@ export default function FundingAgreementsScreen() {
         {/* SYSTEM BAR */}
         <View style={styles.systemBar}>
           <View style={styles.systemIdentity}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
             <Text style={styles.systemName}>
               CIVITRACK
             </Text>
@@ -752,20 +496,9 @@ export default function FundingAgreementsScreen() {
             <Text style={styles.systemDescription}>
               Public Funding & Accountability Management System
             </Text>
-<<<<<<< HEAD
-
-          </View>
-
-
-          {/* TOP RIGHT ACTIONS */}
-
-          <View style={styles.systemActions}>
-
-=======
           </View>
 
           <View style={styles.systemActions}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
             <Pressable
               onPress={() =>
                 router.replace('/dsac/dashboard')
@@ -775,50 +508,17 @@ export default function FundingAgreementsScreen() {
                 pressed && styles.buttonPressed,
               ]}
             >
-<<<<<<< HEAD
-
-              <Text style={styles.dashboardButtonText}>
-                ← Dashboard
-              </Text>
-
-            </Pressable>
-
-
-            <View style={styles.systemStatus}>
-
-=======
               <Text style={styles.dashboardButtonText}>
                 ← Dashboard
               </Text>
             </Pressable>
 
             <View style={styles.systemStatus}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <View style={styles.statusDot} />
 
               <Text style={styles.statusText}>
                 SECURE SYSTEM
               </Text>
-<<<<<<< HEAD
-
-            </View>
-
-          </View>
-
-        </View>
-
-
-        {/* ================================================= */}
-        {/* PAGE CONTENT */}
-        {/* ================================================= */}
-
-        <View style={styles.main}>
-
-          {/* Breadcrumb */}
-
-          <View style={styles.breadcrumb}>
-
-=======
             </View>
           </View>
         </View>
@@ -827,23 +527,14 @@ export default function FundingAgreementsScreen() {
         <View style={styles.main}>
           {/* BREADCRUMB */}
           <View style={styles.breadcrumb}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
             <Pressable
               onPress={() =>
                 router.replace('/dsac/dashboard')
               }
             >
-<<<<<<< HEAD
-
               <Text style={styles.breadcrumbLink}>
                 CIVITRACK
               </Text>
-
-=======
-              <Text style={styles.breadcrumbLink}>
-                CIVITRACK
-              </Text>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
             </Pressable>
 
             <Text style={styles.breadcrumbDivider}>
@@ -861,26 +552,11 @@ export default function FundingAgreementsScreen() {
             <Text style={styles.breadcrumbCurrent}>
               Funding Agreements
             </Text>
-<<<<<<< HEAD
-
-          </View>
-
-
-          {/* ================================================= */}
-          {/* PAGE HEADING */}
-          {/* ================================================= */}
-
-          <View style={styles.heading}>
-
-            <View style={styles.headingContent}>
-
-=======
           </View>
 
           {/* HEADING */}
           <View style={styles.heading}>
             <View style={styles.headingContent}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <View style={styles.sectionMarker} />
 
               <Text style={styles.eyebrow}>
@@ -896,30 +572,17 @@ export default function FundingAgreementsScreen() {
                 allocations and associated accountability
                 requirements.
               </Text>
-<<<<<<< HEAD
-
             </View>
 
-
-=======
-            </View>
-
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
             <Pressable
               style={({ pressed }) => [
                 styles.createButton,
                 pressed && styles.buttonPressed,
               ]}
-<<<<<<< HEAD
-              onPress={() => setShowForm(!showForm)}
-            >
-
-=======
               onPress={() =>
                 setShowForm(!showForm)
               }
             >
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <Text style={styles.createButtonPlus}>
                 +
               </Text>
@@ -929,29 +592,6 @@ export default function FundingAgreementsScreen() {
                   ? 'CLOSE FORM'
                   : 'CREATE AGREEMENT'}
               </Text>
-<<<<<<< HEAD
-
-            </Pressable>
-
-          </View>
-
-
-          {/* ================================================= */}
-          {/* FORM */}
-          {/* ================================================= */}
-
-          {showForm && (
-
-            <View style={styles.form}>
-
-              <View style={styles.formTop} />
-
-
-              <View style={styles.formHeader}>
-
-                <View>
-
-=======
             </Pressable>
           </View>
 
@@ -962,7 +602,6 @@ export default function FundingAgreementsScreen() {
 
               <View style={styles.formHeader}>
                 <View>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   <Text style={styles.formEyebrow}>
                     NEW RECORD
                   </Text>
@@ -975,38 +614,14 @@ export default function FundingAgreementsScreen() {
                     Capture the core details of a departmental
                     funding agreement.
                   </Text>
-<<<<<<< HEAD
-
-                </View>
-
-
-                <View style={styles.formStatus}>
-
-=======
                 </View>
 
                 <View style={styles.formStatus}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   <View style={styles.formStatusDot} />
 
                   <Text style={styles.formStatusText}>
                     DRAFT
                   </Text>
-<<<<<<< HEAD
-
-                </View>
-
-              </View>
-
-
-              <View style={styles.formDivider} />
-
-
-              {/* AGREEMENT NUMBER */}
-
-              <View style={styles.field}>
-
-=======
                 </View>
               </View>
 
@@ -1014,7 +629,6 @@ export default function FundingAgreementsScreen() {
 
               {/* AGREEMENT NUMBER */}
               <View style={styles.field}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <Text style={styles.label}>
                   AGREEMENT NUMBER
                   <Text style={styles.required}>
@@ -1023,23 +637,6 @@ export default function FundingAgreementsScreen() {
                 </Text>
 
                 <TextInput
-<<<<<<< HEAD
-                  style={styles.input}
-                  placeholder="e.g. DSAC-FA-2026-001"
-                  placeholderTextColor="#8A9298"
-                  value={agreementNumber}
-                  onChangeText={setAgreementNumber}
-                  autoCapitalize="characters"
-                />
-
-              </View>
-
-
-              {/* ORGANISATION */}
-
-              <View style={styles.field}>
-
-=======
                   style={[
                     styles.input,
                     errors.agreementNumber &&
@@ -1077,7 +674,6 @@ export default function FundingAgreementsScreen() {
 
               {/* ORGANISATION */}
               <View style={styles.field}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <Text style={styles.label}>
                   ORGANISATION
                   <Text style={styles.required}>
@@ -1085,67 +681,6 @@ export default function FundingAgreementsScreen() {
                   </Text>
                 </Text>
 
-<<<<<<< HEAD
-                <Pressable
-                  style={[
-                    styles.input,
-                    styles.selectInput,
-                    showOrganisationList && styles.selectInputActive,
-                  ]}
-                  onPress={() =>
-                    setShowOrganisationList(!showOrganisationList)
-                  }
-                >
-                  <Text
-                    style={
-                      selectedOrganisation
-                        ? styles.selectText
-                        : styles.selectPlaceholder
-                    }
-                  >
-                    {selectedOrganisation
-                      ? selectedOrganisation.name
-                      : 'Select an organisation'}
-                  </Text>
-
-                  <Text style={styles.selectChevron}>
-                    {showOrganisationList ? '▲' : '▼'}
-                  </Text>
-                </Pressable>
-
-                {showOrganisationList && (
-                  <View style={styles.selectDropdown}>
-                    {organisations.length === 0 ? (
-                      <Text style={styles.selectEmptyText}>
-                        No organisations found. Register one first.
-                      </Text>
-                    ) : (
-                      organisations.map((org) => (
-                        <Pressable
-                          key={org.id}
-                          style={styles.selectOption}
-                          onPress={() => {
-                            setSelectedOrganisation(org);
-                            setShowOrganisationList(false);
-                          }}
-                        >
-                          <Text style={styles.selectOptionText}>
-                            {org.name}
-                          </Text>
-                        </Pressable>
-                      ))
-                    )}
-                  </View>
-                )}
-
-              </View>
-
-
-              {/* AMOUNT */}
-
-              <View style={styles.field}>
-
-=======
                 <TextInput
                   style={[
                     styles.input,
@@ -1177,7 +712,6 @@ export default function FundingAgreementsScreen() {
 
               {/* AMOUNT */}
               <View style={styles.field}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <Text style={styles.label}>
                   FUNDING AMOUNT
                   <Text style={styles.required}>
@@ -1185,10 +719,6 @@ export default function FundingAgreementsScreen() {
                   </Text>
                 </Text>
 
-<<<<<<< HEAD
-                <View style={styles.amountInputContainer}>
-
-=======
                 <View
                   style={[
                     styles.amountInputContainer,
@@ -1196,33 +726,12 @@ export default function FundingAgreementsScreen() {
                       styles.inputError,
                   ]}
                 >
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   <Text style={styles.currencyPrefix}>
                     R
                   </Text>
 
                   <TextInput
                     style={styles.amountInput}
-<<<<<<< HEAD
-                    placeholder="500 000"
-                    placeholderTextColor="#8A9298"
-                    value={amount}
-                    onChangeText={setAmount}
-                    keyboardType="numeric"
-                  />
-
-                </View>
-
-              </View>
-
-
-              {/* DATES */}
-
-              <View style={styles.dateRow}>
-
-                <View style={styles.dateField}>
-
-=======
                     placeholder="500000.00"
                     placeholderTextColor="#8A9298"
                     value={amount}
@@ -1262,7 +771,6 @@ export default function FundingAgreementsScreen() {
               <View style={styles.dateRow}>
                 {/* START DATE */}
                 <View style={styles.dateField}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   <Text style={styles.label}>
                     START DATE
                     <Text style={styles.required}>
@@ -1270,21 +778,6 @@ export default function FundingAgreementsScreen() {
                     </Text>
                   </Text>
 
-<<<<<<< HEAD
-                  <TextInput
-                    style={styles.input}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor="#8A9298"
-                    value={startDate}
-                    onChangeText={setStartDate}
-                  />
-
-                </View>
-
-
-                <View style={styles.dateField}>
-
-=======
                   <Pressable
                     style={[
                       styles.dateInput,
@@ -1325,7 +818,6 @@ export default function FundingAgreementsScreen() {
 
                 {/* END DATE */}
                 <View style={styles.dateField}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                   <Text style={styles.label}>
                     END DATE
                     <Text style={styles.required}>
@@ -1333,74 +825,6 @@ export default function FundingAgreementsScreen() {
                     </Text>
                   </Text>
 
-<<<<<<< HEAD
-                  <TextInput
-                    style={styles.input}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor="#8A9298"
-                    value={endDate}
-                    onChangeText={setEndDate}
-                  />
-
-                </View>
-
-              </View>
-
-
-              {/* FORM ACTIONS */}
-
-              <View style={styles.actions}>
-
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.cancel,
-                    pressed && styles.buttonPressed,
-                  ]}
-                  onPress={() => setShowForm(false)}
-                >
-
-                  <Text style={styles.cancelText}>
-                    CANCEL
-                  </Text>
-
-                </Pressable>
-
-
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.save,
-                    pressed && styles.buttonPressed,
-                  ]}
-                  onPress={saveAgreement}
-                  disabled={saving}
-                >
-
-                  <Text style={styles.saveText}>
-                    {saving ? 'SAVING…' : 'SAVE AGREEMENT'}
-                  </Text>
-
-                </Pressable>
-
-              </View>
-
-            </View>
-
-          )}
-
-
-          {/* ================================================= */}
-          {/* SUMMARY */}
-          {/* ================================================= */}
-
-          <View style={styles.summaryGrid}>
-
-            {/* Active Agreements */}
-
-            <View style={styles.summaryCard}>
-
-              <View style={styles.summaryCardHeader}>
-
-=======
                   <Pressable
                     style={[
                       styles.dateInput,
@@ -1475,7 +899,6 @@ export default function FundingAgreementsScreen() {
           <View style={styles.summaryGrid}>
             <View style={styles.summaryCard}>
               <View style={styles.summaryCardHeader}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <View style={styles.summaryIconGreen}>
                   <Text style={styles.summaryIconText}>
                     FA
@@ -1485,18 +908,10 @@ export default function FundingAgreementsScreen() {
                 <Text style={styles.summaryLabel}>
                   ACTIVE AGREEMENTS
                 </Text>
-<<<<<<< HEAD
-
-              </View>
-
-              <Text style={styles.summaryNumber}>
-                {activeCount}
-=======
               </View>
 
               <Text style={styles.summaryNumber}>
                 0
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               </Text>
 
               <Text style={styles.summaryDescription}>
@@ -1504,23 +919,10 @@ export default function FundingAgreementsScreen() {
               </Text>
 
               <View style={styles.summaryBottomLineGreen} />
-<<<<<<< HEAD
-
-            </View>
-
-
-            {/* Total Allocation */}
-
-            <View style={styles.summaryCard}>
-
-              <View style={styles.summaryCardHeader}>
-
-=======
             </View>
 
             <View style={styles.summaryCard}>
               <View style={styles.summaryCardHeader}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <View style={styles.summaryIconGold}>
                   <Text style={styles.summaryIconTextDark}>
                     R
@@ -1530,18 +932,10 @@ export default function FundingAgreementsScreen() {
                 <Text style={styles.summaryLabel}>
                   TOTAL ALLOCATION
                 </Text>
-<<<<<<< HEAD
-
-              </View>
-
-              <Text style={styles.summaryNumber}>
-                R {totalAllocation.toLocaleString('en-ZA')}
-=======
               </View>
 
               <Text style={styles.summaryNumber}>
                 R 0
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               </Text>
 
               <Text style={styles.summaryDescription}>
@@ -1549,23 +943,10 @@ export default function FundingAgreementsScreen() {
               </Text>
 
               <View style={styles.summaryBottomLineGold} />
-<<<<<<< HEAD
-
-            </View>
-
-
-            {/* Pending */}
-
-            <View style={styles.summaryCard}>
-
-              <View style={styles.summaryCardHeader}>
-
-=======
             </View>
 
             <View style={styles.summaryCard}>
               <View style={styles.summaryCardHeader}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
                 <View style={styles.summaryIconBlue}>
                   <Text style={styles.summaryIconText}>
                     P
@@ -1575,18 +956,10 @@ export default function FundingAgreementsScreen() {
                 <Text style={styles.summaryLabel}>
                   PENDING
                 </Text>
-<<<<<<< HEAD
-
-              </View>
-
-              <Text style={styles.summaryNumber}>
-                {pendingCount}
-=======
               </View>
 
               <Text style={styles.summaryNumber}>
                 0
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               </Text>
 
               <Text style={styles.summaryDescription}>
@@ -1594,29 +967,12 @@ export default function FundingAgreementsScreen() {
               </Text>
 
               <View style={styles.summaryBottomLineBlue} />
-<<<<<<< HEAD
-
-            </View>
-
-          </View>
-
-
-          {/* ================================================= */}
-          {/* AGREEMENT LIST */}
-          {/* ================================================= */}
-
-          <View style={styles.listHeader}>
-
-            <View>
-
-=======
             </View>
           </View>
 
           {/* LIST HEADER */}
           <View style={styles.listHeader}>
             <View>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <Text style={styles.listEyebrow}>
                 RECORDS
               </Text>
@@ -1624,44 +980,6 @@ export default function FundingAgreementsScreen() {
               <Text style={styles.sectionTitle}>
                 Funding Agreements
               </Text>
-<<<<<<< HEAD
-
-            </View>
-
-
-            <View style={styles.recordCount}>
-
-              <Text style={styles.recordCountText}>
-                {agreements.length} RECORD{agreements.length === 1 ? '' : 'S'}
-              </Text>
-
-            </View>
-
-          </View>
-
-
-          {loading ? (
-
-            <View style={styles.loadingBox}>
-              <ActivityIndicator size="large" color="#123B63" />
-              <Text style={styles.loadingText}>Loading funding agreements…</Text>
-            </View>
-
-          ) : agreements.length === 0 ? (
-
-          /* ================================================= */
-          /* EMPTY STATE */
-          /* ================================================= */
-
-          <View style={styles.empty}>
-
-            <View style={styles.emptyIcon}>
-
-              <Text style={styles.emptyIconText}>
-                FA
-              </Text>
-
-=======
             </View>
 
             <View style={styles.recordCount}>
@@ -1677,7 +995,6 @@ export default function FundingAgreementsScreen() {
               <Text style={styles.emptyIconText}>
                 FA
               </Text>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
             </View>
 
             <Text style={styles.emptyTitle}>
@@ -1694,89 +1011,6 @@ export default function FundingAgreementsScreen() {
               creating a funding agreement.
             </Text>
 
-<<<<<<< HEAD
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.emptyButton,
-                pressed && styles.buttonPressed,
-              ]}
-              onPress={() => setShowForm(true)}
-            >
-
-              <Text style={styles.emptyButtonText}>
-                + CREATE FIRST AGREEMENT
-              </Text>
-
-            </Pressable>
-
-          </View>
-
-          ) : (
-
-          /* ================================================= */
-          /* RECORD LIST */
-          /* ================================================= */
-
-          <View style={styles.recordList}>
-
-            {agreements.map((agreement) => (
-
-              <View key={agreement.id} style={styles.recordCard}>
-
-                <View style={styles.recordCardTop}>
-                  <Text style={styles.recordNumber}>
-                    {agreement.agreement_number}
-                  </Text>
-
-                  <View style={styles.recordStatusBadge}>
-                    <Text style={styles.recordStatusText}>
-                      {agreement.status}
-                    </Text>
-                  </View>
-                </View>
-
-                <Text style={styles.recordOrg}>
-                  {agreement.organisations?.name || 'Unknown organisation'}
-                </Text>
-
-                <View style={styles.recordCardBottom}>
-                  <Text style={styles.recordAmount}>
-                    {agreement.currency || 'ZAR'} {Number(agreement.allocated_amount || 0).toLocaleString('en-ZA')}
-                  </Text>
-
-                  <Text style={styles.recordDates}>
-                    {agreement.start_date} → {agreement.end_date}
-                  </Text>
-                </View>
-
-              </View>
-
-            ))}
-
-          </View>
-
-          )}
-
-
-          {/* ================================================= */}
-          {/* INFORMATION NOTICE */}
-          {/* ================================================= */}
-
-          <View style={styles.notice}>
-
-            <View style={styles.noticeIcon}>
-
-              <Text style={styles.noticeIconText}>
-                i
-              </Text>
-
-            </View>
-
-
-            <View style={styles.noticeContent}>
-
-=======
             <Pressable
               style={({ pressed }) => [
                 styles.emptyButton,
@@ -1800,7 +1034,6 @@ export default function FundingAgreementsScreen() {
             </View>
 
             <View style={styles.noticeContent}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
               <Text style={styles.noticeTitle}>
                 FUNDING ADMINISTRATION
               </Text>
@@ -1811,29 +1044,12 @@ export default function FundingAgreementsScreen() {
                 organisations, accountability cases and
                 approval workflows.
               </Text>
-<<<<<<< HEAD
-
-            </View>
-
-          </View>
-
-        </View>
-
-
-        {/* ================================================= */}
-        {/* FOOTER */}
-        {/* ================================================= */}
-
-        <View style={styles.footer}>
-
-=======
             </View>
           </View>
         </View>
 
         {/* FOOTER */}
         <View style={styles.footer}>
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
           <Text style={styles.footerRepublic}>
             REPUBLIC OF SOUTH AFRICA
           </Text>
@@ -1852,25 +1068,6 @@ export default function FundingAgreementsScreen() {
           <Text style={styles.footerCopyright}>
             © 2026 Department of Sport, Arts and Culture
           </Text>
-<<<<<<< HEAD
-
-        </View>
-
-      </ScrollView>
-
-    </SafeAreaView>
-    </ProtectedRoute>
-  );
-}
-
-
-/* ========================================================= */
-/* STYLES */
-/* ========================================================= */
-
-const styles = StyleSheet.create({
-
-=======
         </View>
       </ScrollView>
 
@@ -1945,7 +1142,6 @@ const styles = StyleSheet.create({
 ============================================================ */
 
 const styles = StyleSheet.create({
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   safeArea: {
     flex: 1,
     backgroundColor: '#F2F4F5',
@@ -1955,14 +1151,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* FLAG STRIP */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   flagStrip: {
     height: 6,
     flexDirection: 'row',
@@ -1993,14 +1181,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#DE3831',
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* GOVERNMENT HEADER */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   govHeader: {
     backgroundColor: '#18202A',
     paddingHorizontal: 32,
@@ -2027,11 +1207,8 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 35,
     backgroundColor: '#FFFFFF',
-<<<<<<< HEAD
-=======
     borderWidth: 2,
     borderColor: '#D4A72C',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -2076,14 +1253,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* SYSTEM BAR */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   systemBar: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 32,
@@ -2119,11 +1288,8 @@ const styles = StyleSheet.create({
   },
 
   dashboardButton: {
-<<<<<<< HEAD
-=======
     borderWidth: 1,
     borderColor: '#D4A72C',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     backgroundColor: '#FFF9E8',
     paddingHorizontal: 13,
     paddingVertical: 8,
@@ -2160,14 +1326,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.7,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* MAIN */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   main: {
     width: '100%',
     maxWidth: 1200,
@@ -2176,14 +1334,6 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* BREADCRUMB */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   breadcrumb: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2209,14 +1359,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* HEADING */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   heading: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -2286,14 +1428,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* FORM */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   form: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -2398,130 +1532,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-<<<<<<< HEAD
-  selectInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  selectInputActive: {
-    borderColor: '#123B63',
-  },
-
-  selectText: {
-    color: '#1E272F',
-    fontSize: 13,
-  },
-
-  selectPlaceholder: {
-    color: '#8A9298',
-    fontSize: 13,
-  },
-
-  selectChevron: {
-    color: '#8A9298',
-    fontSize: 11,
-  },
-
-  selectDropdown: {
-    borderWidth: 1,
-    borderColor: '#C8CED2',
-    backgroundColor: '#FFFFFF',
-    marginTop: 4,
-    maxHeight: 220,
-  },
-
-  selectOption: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
-  },
-
-  selectOptionText: {
-    color: '#1E272F',
-    fontSize: 13,
-  },
-
-  selectEmptyText: {
-    padding: 14,
-    color: '#8A9298',
-    fontSize: 12,
-  },
-
-  loadingBox: {
-    alignItems: 'center',
-    paddingVertical: 48,
-  },
-
-  loadingText: {
-    marginTop: 12,
-    color: '#667085',
-    fontSize: 13,
-  },
-
-  recordList: {
-    gap: 12,
-  },
-
-  recordCard: {
-    borderWidth: 1,
-    borderColor: '#D8DDDF',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    marginBottom: 12,
-  },
-
-  recordCardTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-
-  recordNumber: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#18202A',
-  },
-
-  recordStatusBadge: {
-    backgroundColor: '#E8F3EE',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 3,
-  },
-
-  recordStatusText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#1F6B4F',
-    letterSpacing: 0.5,
-  },
-
-  recordOrg: {
-    fontSize: 12,
-    color: '#4B5560',
-    marginBottom: 10,
-  },
-
-  recordCardBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  recordAmount: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#123B63',
-  },
-
-  recordDates: {
-    fontSize: 11,
-    color: '#8A9298',
-=======
   inputError: {
     borderColor: '#C0392B',
     backgroundColor: '#FFF8F7',
@@ -2539,7 +1549,6 @@ const styles = StyleSheet.create({
     color: '#8A9298',
     fontSize: 8,
     marginTop: 5,
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   },
 
   amountInputContainer: {
@@ -2576,8 +1585,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-<<<<<<< HEAD
-=======
   dateInput: {
     height: 49,
     borderWidth: 1,
@@ -2801,7 +1808,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   actions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -2843,14 +1849,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* SUMMARY */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   summaryGrid: {
     flexDirection: 'row',
     gap: 15,
@@ -2965,14 +1963,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#315A91',
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* LIST HEADER */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -3010,14 +2000,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* EMPTY STATE */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   empty: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -3079,23 +2061,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* INFORMATION NOTICE */
-  /* ================================================= */
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
   notice: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#D8DDDF',
-<<<<<<< HEAD
-=======
     borderLeftWidth: 4,
     borderLeftColor: '#D4A72C',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     padding: 16,
     marginTop: 18,
     flexDirection: 'row',
@@ -3135,20 +2106,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-<<<<<<< HEAD
-
-  /* ================================================= */
-  /* FOOTER */
-  /* ================================================= */
-
-  footer: {
-    backgroundColor: '#18202A',
-=======
   footer: {
     backgroundColor: '#18202A',
     borderTopWidth: 4,
     borderTopColor: '#007A4D',
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
     paddingVertical: 27,
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -3187,8 +2148,4 @@ const styles = StyleSheet.create({
     color: '#7F8992',
     fontSize: 8,
   },
-<<<<<<< HEAD
-
-=======
->>>>>>> 76cc13b6f3b2442cce35e7c1295bed12a51b8c16
 });
